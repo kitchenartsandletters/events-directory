@@ -1,0 +1,127 @@
+{%- liquid
+  assign collection_has_image = false
+  if collection.image and section.settings.show_collection_image
+    assign collection_has_image = true
+  endif
+-%}
+<style>
+.section--{{ section.id }} .collection__header-media-overlay:before,
+.section--{{ section.id }} .collection__header-media-overlay:before {
+    background: {{ section.settings.overlay_color }};
+    {% if section.settings.overlay_strength == 100 %}
+        opacity: 1;
+    {% else %}
+        opacity: .{{ section.settings.overlay_strength }};
+    {% endif %}
+}
+</style>
+
+<section class="section section--mb-0 section--{{ section.id }} section--full" data-section-id="{{ section.id }}" data-section-type="collection-template">
+
+    <div class="collection js-collection-banner{% if collection.image and section.settings.show_collection_image %} collection--img{% endif %}{% if section.settings.center_title %} collection--center{% endif %}"  data-collection-has-image="{{ collection_has_image }}">
+        
+        <div class="collection__header{% if collection.image and section.settings.show_collection_image %} collection__header--img{% endif %}">
+            {% if collection.image and section.settings.show_collection_image %}
+                <div class="collection__header-media o-ratio o-ratio--{{ section.settings.collection_image_height }}{% if section.settings.collection_image_mobile_height %} collection__header-media--mobile-height{% endif %}" style="background-image: url('{{ collection.image | img_url: '1x1' }}')">
+                    <img
+                        class="collection__header-img collection__header-img--{{ section.id }}"
+                        src="{{ collection.image | img_url: '600x' }}"
+                        srcset="{% render 'bgset', image: collection.image %}"
+                        width="600"
+                        height="{{ 600 | divided_by: collection.image.aspect_ratio | round }}"
+                        sizes="100vw"
+                        alt="{{ collection.image.alt }}"
+                        loading="eager"
+                    />
+                    <div class="collection__header-media-overlay u-bg-overlay"></div>
+                </div>
+            {% endif %}
+            <div class="container container--p-0">
+                <div class="collection__header-info">
+                    <div class="section__title collection__header-info__title{% if section.settings.center_title %} section__title--center{% endif %}">
+                        <h1 class="section__title-text collection__header-info__title-text">{{ collection.title }}</h1>
+                    </div>
+                    {% if collection.description != blank %}
+                        <div class="collection__header-info__text rte rte--header">
+                            {% comment %}{{ collection.description }}{% endcomment %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section> 
+
+{% unless section.settings.show_collection_image %}
+    <script>
+        document.querySelector('.js-header').setAttribute('data-transparent-header', false)
+    </script>
+{% endunless %}
+
+{% schema %}
+{
+    "name": "Collection banner",
+    "class": "js-section__collection-banner",
+    "settings": [
+        {
+            "type": "checkbox",
+            "id": "center_title",
+            "label": "Center heading and text",
+            "default": true
+        },
+        {
+            "type": "checkbox",
+            "id": "show_collection_image",
+            "label": "Show image",
+            "default": true
+        },
+        {
+            "type": "select",
+            "id": "collection_image_height",
+            "label": "Image height",
+            "default": "4:1",
+            "options": [
+                {
+                    "label": "Small",
+                    "value": "4:1"
+                },
+                {
+                    "label": "Medium",
+                    "value": "3:1"
+                },
+                {
+                    "label": "Large",
+                    "value": "5:2"
+                },
+                {
+                    "label": "Extra large",
+                    "value": "16:9"
+                }
+            ]
+        },
+        {
+            "type": "checkbox",
+            "id": "collection_image_mobile_height",
+            "label": "Increase image height on mobile",
+            "default": true
+        },
+        {
+            "type": "color",
+            "id": "overlay_color",
+            "label": "Overlay color",
+            "default": "#000000"
+        },
+        {
+            "type": "range",
+            "id": "overlay_strength",
+            "label": "Overlay strength",
+            "unit": "%",
+            "min": 0,
+            "max": 100,
+            "step": 10,
+            "default": 0
+        }
+    ]
+}
+{% endschema %}

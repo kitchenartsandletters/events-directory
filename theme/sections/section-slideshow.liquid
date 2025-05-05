@@ -1,0 +1,768 @@
+{%- assign text_color_brightness = section.settings.text_color | color_brightness -%}
+{%- assign nav_dots_base_color = '#fff' -%}
+<style>
+.section--{{ section.id }} .home-carousel__bg--overlay:before,
+.section--{{ section.id }} .home-carousel__bg:before,
+.section--{{ section.id }} .home-carousel__video:before {
+    background: {{ section.settings.overlay_color }};
+    {% if section.settings.overlay_strength == 100 %}
+        opacity: 1;
+    {% else %}
+        opacity: .{{ section.settings.overlay_strength }};
+    {% endif %}
+}
+
+.section--{{ section.id }} .section__title-text,
+.section--{{ section.id }} .home-carousel__text,
+.section--{{ section.id }} .home-carousel__text.rte a,
+.section--{{ section.id }} .link,
+.section--{{ section.id }} .link-body {
+    color: {{ section.settings.text_color }};
+}
+
+{% if section.settings.style == 'solid' or section.settings.style == 'semi' %}
+.section--{{ section.id }} .home-carousel__content {
+    {% if section.settings.style == 'solid' %}
+        background-color: {{ section.settings.text_bg_color }};
+    {% else %}
+        background-color: {{ section.settings.text_bg_color | color_modify: 'alpha', 0.8 }};
+    {% endif %}
+}
+{% endif %}
+
+.section--{{ section.id }} .home-carousel__nav-dots .slick-dots li.slick-active button,
+.section--{{ section.id }} .home-carousel__nav-dots .slick-dots li:hover button,
+.section--{{ section.id }} .home-carousel__nav-dots .slick-dots li:focus button {
+    {% if section.settings.nav_style == 'solid-brand' %}
+        background: {{ settings.color_brand }};
+    {% else %}
+        background: {{ nav_dots_base_color }};
+    {% endif %}
+}
+.section--{{ section.id }} .home-carousel__nav--solid .slick-dots li button {
+    background: {{ nav_dots_base_color | color_modify: 'alpha', 0.4 }};
+    border-color: transparent;
+}
+.section--{{ section.id }} .home-carousel__nav--outline .slick-dots li button {
+    border-color: {{ nav_dots_base_color }};
+}
+.section--{{ section.id }} .home-carousel__nav--outline .slick-dots li.slick-active button,
+.section--{{ section.id }} .home-carousel__nav--outline .slick-dots li:hover button,
+.section--{{ section.id }} .home-carousel__nav--outline .slick-dots li:focus button {
+    background: transparent;
+    box-shadow: 0px 0px 0px 1px {{ nav_dots_base_color }};
+}
+.section--{{ section.id }} .c-btn--mono {
+    {% if section.settings.style == 'transparent' %}
+        color: {% if text_color_brightness < 125 %}white{% else %}black{% endif %};
+        background: {{ section.settings.text_color }};
+    {% else %}
+        color: {{ section.settings.text_bg_color }};
+        background: {{ section.settings.text_color }};
+    {% endif %}
+}
+.section--{{ section.id }} .c-btn--mono:hover {
+    {% if text_color_brightness < 125 %}
+        background: {{ section.settings.text_color | color_lighten: 10 }};
+    {% else %}
+        background: {{ section.settings.text_color | color_darken: 10 }};
+    {% endif %};
+}
+.section--{{ section.id }} .c-btn--hollow {
+    color: {{ section.settings.text_color }};
+    box-shadow: inset 0px 0px 0px 1px {{ section.settings.text_color }};
+}
+.section--{{ section.id }} .c-btn--hollow:hover {
+    color: {% if text_color_brightness < 125 %}white{% else %}black{% endif %};
+    background-color: {{ section.settings.text_color }};
+}
+{% if section.settings.text_heading_color %}
+    .section--{{ section.id }} .section__title-text {
+      color: {{ settings.color_headings }};
+    }
+{% endif %}
+{% unless section.settings.text_border_color %}
+    .section--{{ section.id }} .section__title.section__title .section__title-text:after {
+        background: {{ section.settings.text_color }};
+    }
+{% endunless %}
+{% if section.settings.nav_arrows %}
+    .section--{{ section.id }} .home-carousel__nav__item {
+        display: none !important;
+    }
+{% endif %}
+
+/* Loading states */
+.home-carousel-wrapper--loading {
+    position: relative;
+    overflow: hidden;
+}
+.home-carousel-wrapper--loading::before {
+    content: "";
+    display: block;
+    float: left;
+    position: relative;
+    width: 100%;
+}
+.home-carousel-wrapper--loading--small::before {
+    padding-bottom: 40%;
+}
+.home-carousel-wrapper--loading--medium::before {
+    padding-bottom: 50%;
+}
+.home-carousel-wrapper--loading--large::before {
+    padding-bottom: 62.5%;
+}
+.home-carousel-wrapper--loading--full-screen::before {
+    padding-bottom: 100vh;
+}
+.home-carousel--loading {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+}
+@media screen and (max-width: 980px) {
+    .home-carousel-wrapper--loading--small::before {
+        padding-bottom: 100%;
+    }
+    .home-carousel-wrapper--loading--medium::before {
+        padding-bottom: 125%;
+    }
+    .home-carousel-wrapper--loading--large::before {
+        padding-bottom: 140%;
+    }
+}
+{% if request.design_mode %}
+/* Fixing loading scroll when new slide is added in the editor */
+    .home-carousel--loading > div:not(:first-child) {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+    }
+{% endif %}
+
+.home-carousel__hover a:hover {
+  /* Disable the hover effect for links within your slideshow */
+  opacity: 1 !important;
+}
+  
+</style>
+{% if section.blocks.size > 0 %}
+<section class="section section--{{ section.id }} {% if section.settings.slideshow_width == 'full' %} section--full section--full-mobile{% endif %}{% if section.settings.section-bottom-margin %}{% if section.settings.slideshow_width == 'contained' %} section--mb-m{% else %} section--mb-0{% endif %}{% endif %} home-carousel__hover" data-section-id="{{ section.id }}" data-section-type="home-carousel">
+
+    {% if section.settings.slideshow_width == 'contained' %}<div class="container">{% endif %}
+
+        <div class="home-carousel-wrapper home-carousel-wrapper--loading home-carousel-wrapper--loading--{{ section.settings.slideshow_height }} home-carousel-wrapper--{{ section.settings.slideshow_width }}">
+            <div class="home-carousel home-carousel--{{ section.settings.style }} home-carousel--title-{{ section.settings.title_size }} {{ block.settings.text_color }} js-home-carousel  home-carousel--loading home-carousel--animation-loading {% if section.settings.slideshow_width == 'full' %} home-carousel--full{% endif %}{% if section.blocks.size == 1 %} home-carousel--single-slide{% endif %}" data-autoplay="{{ section.settings.autoplay }}" data-slick='{"autoplay": {{ section.settings.autoplay }}, "autoplaySpeed": {{ section.settings.autoplay_speed }}000}'>
+
+                {% for block in section.blocks %}
+                <div {{ block.shopify_attributes }}>
+                <a href={{ block.settings.link }}>
+
+                    <div class="home-carousel__item-wrapper home-carousel__item-wrapper--{{ block.id }} home-carousel__item-wrapper--{{ section.settings.slideshow_height }} o-ratio">
+
+                    <div class="o-ratio__content home-carousel__item home-carousel__item--{{ block.type }} home-carousel__item--{{ block.id }} home-carousel__item--middle home-carousel__item--{{ block.settings.alignment }}" data-slide-id="{{ forloop.index0 }}">
+
+
+                        {% if block.settings.video_link != blank or block.settings.yt_link != blank %}
+                          <div class="home-carousel__video u-bg-overlay js-home-carousel-video{% if block.settings.video_link != blank %} home-carousel__video--self js-home-carousel-video--self{% elsif block.settings.yt_link != blank %} home-carousel__video--yt js-home-carousel-video--yt{% endif %}">
+
+                                <div class="theme-spinner">
+                                    <div class="theme-spinner__border"></div>
+                                    <div class="theme-spinner__border"></div>
+                                    <div class="theme-spinner__border"></div>
+                                    <div class="theme-spinner__border"></div>
+                                </div>
+
+                                {% if block.settings.video_link != blank %}
+                                    <video class="home-carousel__video-video" id="video-bg-{{ block.id }}" src="{{ block.settings.video_link }}" loop="true" muted="true" playsinline="true" autoplay="true"></video>
+                                {% elsif block.settings.yt_link != blank %}
+                                    <div id="yt-{{ section.id }}_{{ forloop.index0 }}"
+                                        class="js-home-carousel-video-data"
+                                        data-player-id="player_{{ section.id }}_{{ forloop.index0 }}"
+                                        data-video-id="{{ block.settings.yt_link.id }}"
+                                        data-elem-id="yt-{{ section.id }}_{{ forloop.index0 }}"
+                                        tabindex="-1"
+                                    ></div>
+                                {% endif %}
+
+                            </div>
+                        {% else %}
+                            {% unless block.settings.image == blank %}
+
+                                <div class="home-carousel__bg-wrapper">
+                                    <div class="home-carousel__bg--cover u-bg-contain u-bg-overlay" role="img" style="background-image: url('{{ block.settings.image | img_url: '1x1' }}')"></div>
+
+                                    <div class="theme-spinner theme-spinner--white"></div>
+
+
+                                    <style type="text/css">
+                                        {% if block.settings.image_mobile %}
+                                            @media screen and (min-width: 768px) {
+                                                .home-carousel__bg--{{ section.id }}{{ forloop.index0 }} {
+                                                    object-position: {{ block.settings.image.presentation.focal_point }};
+                                                }
+                                            }
+                                            @media screen and (max-width: 767px) {
+                                                .home-carousel__bg--{{ section.id }}{{ forloop.index0 }} {
+                                                    object-position: {{ block.settings.image_mobile.presentation.focal_point }};
+                                                }
+                                            }
+                                        {% else %}
+                                            .home-carousel__bg--{{ section.id }}{{ forloop.index0 }} {
+                                                object-position: {{ block.settings.image.presentation.focal_point }};
+                                            }
+                                        {% endif %}
+                                    </style>
+
+                                    <picture>
+                                        <source
+                                            {% if block.settings.image_mobile %}
+                                            srcset="{% render 'bgset', image: block.settings.image_mobile %}"
+                                            {% else %}
+                                            srcset="{% render 'bgset', image: block.settings.image %}"
+                                            {% endif %}
+                                            media="all and (max-width: 980px)"
+                                        />
+                                        <source
+                                            srcset="{% render 'bgset', image: block.settings.image %}"
+                                            media="all and (min-width: 981px)"
+                                        />
+                                        <img
+                                            class="home-carousel__bg home-carousel__bg--{{ section.id }}{{ forloop.index0 }}"
+                                            src="{{ block.settings.image | img_url: '600x' }}"
+                                            width="600"
+                                            height="{{ 600 | divided_by: block.settings.image.aspect_ratio | round }}"
+                                            alt="{{ block.settings.image.alt }}"
+                                            {% if forloop.first == true %}
+                                                loading="eager"
+                                            {% else %}
+                                                loading="lazy"
+                                            {% endif %}
+                                        />
+                                    </picture>
+
+                                    <div class="home-carousel__bg--overlay u-bg-contain u-bg-overlay"></div>
+                                </div>
+
+
+                            {% else %}
+                                <div class="home-carousel__bg u-bg-cover u-bg-overlay">
+                                    {% capture current %}{% cycle 1, 2 %}{% endcapture %}
+                                    {{ 'lifestyle-' | append: current | placeholder_svg_tag: 'placeholder-svg' }}
+                                </div>
+                            {% endunless %}
+                        {% endif %}
+
+                        {% unless block.settings.title == blank and block.settings.text == blank and block.settings.link_title == blank and block.settings.link_title_2 == blank %}
+                            <div role="contentinfo" class="home-carousel__content{% if block.settings.link_title != blank or block.settings.link_title_2 != blank %} home-carousel__content--btn{% endif %}" aria-label="section title">
+                                {% unless block.settings.title == blank %}
+                                    <div class="home-carousel__title section__title h2">
+                                        <h2 class="section__title-text">{{ block.settings.title | raw }}</h2>
+                                    </div>
+                                {% endunless %}
+                                {% unless block.settings.text == blank %}
+                                    <div class="home-carousel__text rte">{{ block.settings.text }}</div>
+                                {% endunless %}
+                                {% if block.settings.link_title != blank or block.settings.link_title_2 != blank %}
+                                    <div class="home-carousel__btn__wrapper u-flex u-flex--middle">
+                                        {% unless block.settings.link_title == blank %}
+                                            <a href="{{ block.settings.link }}" class="home-carousel__btn {{ block.settings.link_style }}">{{ block.settings.link_title | escape }}</a>
+                                        {% endunless %}
+                                        {% unless block.settings.link_title_2 == blank %}
+                                            <a href="{{ block.settings.link_2 }}" class="home-carousel__btn {{ block.settings.link_style_2 }}">{{ block.settings.link_title_2 | escape }}</a>
+                                        {% endunless %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endunless %}
+
+                    </div>
+                    </a>
+                    </div>
+                </div>
+                {% endfor %}
+
+            </div>
+
+            {%- if section.blocks.size > 1 -%}
+                <div class="home-carousel__nav js-home-carousel-nav{% if section.settings.nav_style contains 'solid' %} home-carousel__nav--solid{% endif %}{% if section.settings.nav_style contains 'outline' %} home-carousel__nav--outline{% endif %}">
+                    <div class="home-carousel__nav-dots js-home-carousel-nav-dots"></div>
+                </div>
+            {%- endif -%}
+
+        </div>
+
+    {% if section.settings.slideshow_width == 'contained' %}</div>{% endif %}
+
+</section>
+{% endif %}
+
+{% if section.blocks.size == 0 %}
+    <div class="placeholder-noblocks">
+        {{ 'homepage.onboarding.no_content' | t }}
+    </div>
+{% endif %}
+
+{% schema %}
+{
+    "name": "Slideshow",
+    "class": "js-section__home-slider",
+    "max_blocks": 5,
+    "settings": [
+        {
+            "type": "select",
+            "id": "style",
+            "label": "Text background style",
+            "default": "solid",
+            "options": [
+                {
+                    "label": "Solid",
+                    "value": "solid"
+                },
+                {
+                    "label": "Semi-opaque",
+                    "value": "semi"
+                },
+                {
+                    "label": "Transparent",
+                    "value": "transparent"
+                }
+            ]
+        },
+        {
+            "type": "range",
+            "id": "title_size",
+            "label": "Heading size",
+            "min": 1,
+            "max": 5,
+            "step": 1,
+            "default": 3
+        },
+        {
+            "type": "checkbox",
+            "id": "autoplay",
+            "label": "Auto-rotate slides",
+            "default": true
+        },
+        {
+            "type": "range",
+            "id": "autoplay_speed",
+            "label": "Change slides every",
+            "unit": "sec",
+            "min": 5,
+            "max": 10,
+            "step": 1,
+            "default": 8
+        },
+        {
+            "type": "select",
+            "id": "nav_style",
+            "label": "Slide navigation style",
+            "default": "solid-brand",
+            "options": [
+                {
+                    "value": "solid-brand",
+                    "label": "Solid dots (brand)"
+                },
+                {
+                    "value": "solid-mono",
+                    "label": "Solid dots (mono)"
+                },
+                {
+                    "value": "outline",
+                    "label": "Outline dots"
+                }
+            ]
+        },
+        {
+            "type": "checkbox",
+            "id": "nav_arrows",
+            "label": "Hide navigation arrows",
+            "default": false
+        },
+        {
+            "type": "select",
+            "id": "slideshow_height",
+            "label": "Section height",
+            "default": "full-screen",
+            "info": "For information on image cropping [click here](https://support.safeasmilk.co/article/138-slideshow-image-sizes-cropping).",
+            "options": [
+                {
+                    "label": "Small",
+                    "value": "small"
+                },
+                {
+                    "label": "Medium",
+                    "value": "medium"
+                },
+                {
+                    "label": "Large",
+                    "value": "large"
+                },
+                {
+                    "label": "Full screen",
+                    "value": "full-screen"
+                }
+            ]
+        },
+        {
+            "type": "select",
+            "id": "slideshow_width",
+            "label": "Section width",
+            "default": "full",
+            "options": [
+                {
+                    "label": "Contained",
+                    "value": "contained"
+                },
+                {
+                    "label": "Full",
+                    "value": "full"
+                }
+            ]
+        },
+        {
+            "type": "checkbox",
+            "id": "section-bottom-margin",
+            "label": "Reduce bottom margin",
+            "default": false
+        },
+        {
+            "type": "header",
+            "content": "Colors"
+        },
+        {
+            "type": "color",
+            "id": "text_color",
+            "label": "Text color",
+            "default": "#111111"
+        },
+        {
+            "type": "checkbox",
+            "id": "text_heading_color",
+            "label": "Use default heading color",
+            "default": false
+        },
+        {
+            "type": "checkbox",
+            "id": "text_border_color",
+            "label": "Use default brand border color",
+            "default": true
+        },
+        {
+            "type": "color",
+            "id": "text_bg_color",
+            "label": "Text background color",
+            "default": "#ffffff"
+        },
+        {
+            "type": "color",
+            "id": "overlay_color",
+            "label": "Overlay color",
+            "default": "#000000"
+        },
+        {
+            "type": "range",
+            "id": "overlay_strength",
+            "label": "Overlay strength",
+            "unit": "%",
+            "min": 0,
+            "max": 100,
+            "step": 10,
+            "default": 10
+        }
+    ],
+    "blocks": [
+        {
+            "type": "image",
+            "name": "Image slide",
+            "settings": [
+                {
+                    "type": "image_picker",
+                    "id": "image",
+                    "label": "Image",
+                    "info": "2200px width recommended."
+                },
+                {
+                    "type": "image_picker",
+                    "id": "image_mobile",
+                    "label": "Mobile image",
+                    "info": "Alternative image for mobile devices. 1200px width and portrait ratio recommended."
+                },
+                {
+                    "type": "select",
+                    "id": "alignment",
+                    "label": "Text position",
+                    "default": "left",
+                    "options": [
+                        {
+                            "value": "left",
+                            "label": "Left"
+                        },
+                        {
+                            "value": "center",
+                            "label": "Center"
+                        },
+                        {
+                            "value": "right",
+                            "label": "Right"
+                        },
+                        {
+                            "value": "bottom-left",
+                            "label": "Bottom left"
+                        },
+                        {
+                            "value": "bottom-center",
+                            "label": "Bottom center"
+                        },
+                        {
+                            "value": "bottom-right",
+                            "label": "Bottom right"
+                        }
+                    ]
+                },
+                {
+                    "type": "text",
+                    "id": "title",
+                    "label": "Heading",
+                    "default": "Image slide"
+                },
+                {
+                    "type": "richtext",
+                    "id": "text",
+                    "label": "Subheading",
+                    "default": "<p>Use these slides to tell the world about your brand. You can use images or background video along with text and links.</p>"
+                },
+                {
+                    "type": "header",
+                    "content": "Button 1"
+                },
+                {
+                    "type": "select",
+                    "id": "link_style",
+                    "label": "Button style",
+                    "options": [
+                        {
+                            "value": "c-btn c-btn--primary",
+                            "label": "Solid button (brand)"
+                        },
+                        {
+                            "value": "c-btn c-btn--mono",
+                            "label": "Solid button (mono)"
+                        },
+                        {
+                            "value": "c-btn c-btn--hollow",
+                            "label": "Outline button"
+                        }
+                    ],
+                    "default": "c-btn c-btn--hollow"
+                },
+                {
+                    "type": "text",
+                    "id": "link_title",
+                    "label": "Label",
+                    "default": "Shop all"
+                },
+                {
+                    "type": "url",
+                    "id": "link",
+                    "label": "Link"
+                },
+                {
+                    "type": "header",
+                    "content": "Button 2"
+                },
+                {
+                    "type": "select",
+                    "id": "link_style_2",
+                    "label": "Button style",
+                    "options": [
+                        {
+                            "value": "c-btn c-btn--primary",
+                            "label": "Solid button (brand)"
+                        },
+                        {
+                            "value": "c-btn c-btn--mono",
+                            "label": "Solid button (mono)"
+                        },
+                        {
+                            "value": "c-btn c-btn--hollow",
+                            "label": "Outline button"
+                        }
+                    ],
+                    "default": "c-btn c-btn--primary"
+                },
+                {
+                    "type": "text",
+                    "id": "link_title_2",
+                    "label": "Label",
+                    "default": "Shop new"
+                },
+                {
+                    "type": "url",
+                    "id": "link_2",
+                    "label": "Link"
+                }
+            ]
+        },
+        {
+            "type": "video",
+            "name": "Video slide",
+            "settings": [
+                {
+                    "type": "text",
+                    "id": "video_link",
+                    "label": "MP4 video link",
+                    "info": "Accepts self-hosted MP4 video links. [Learn more](https://support.safeasmilk.co/article/134-slideshow-video-background)"
+                },
+                {
+                    "type": "video_url",
+                    "id": "yt_link",
+                    "label": "YouTube video link",
+                    "accept": [
+                        "youtube"
+                    ]
+                },
+                {
+                    "type": "select",
+                    "id": "alignment",
+                    "label": "Text position",
+                    "default": "left",
+                    "options": [
+                        {
+                            "value": "left",
+                            "label": "Left"
+                        },
+                        {
+                            "value": "center",
+                            "label": "Center"
+                        },
+                        {
+                            "value": "right",
+                            "label": "Right"
+                        },
+                        {
+                            "value": "bottom-left",
+                            "label": "Bottom left"
+                        },
+                        {
+                            "value": "bottom-center",
+                            "label": "Bottom center"
+                        },
+                        {
+                            "value": "bottom-right",
+                            "label": "Bottom right"
+                        }
+                    ]
+                },
+                {
+                    "type": "text",
+                    "id": "title",
+                    "label": "Heading",
+                    "default": "Video slide"
+                },
+                {
+                    "type": "richtext",
+                    "id": "text",
+                    "label": "Subheading",
+                    "default": "<p>Use these slides to tell the world about your brand. You can use images or background video along with text and links.</p>"
+                },
+                {
+                    "type": "header",
+                    "content": "Button 1"
+                },
+                {
+                    "type": "select",
+                    "id": "link_style",
+                    "label": "Button style",
+                    "options": [
+                        {
+                            "value": "c-btn c-btn--primary",
+                            "label": "Solid button (brand)"
+                        },
+                        {
+                            "value": "c-btn c-btn--mono",
+                            "label": "Solid button (mono)"
+                        },
+                        {
+                            "value": "c-btn c-btn--hollow",
+                            "label": "Outline button"
+                        }
+                    ],
+                    "default": "c-btn c-btn--hollow"
+                },
+                {
+                    "type": "text",
+                    "id": "link_title",
+                    "label": "Label",
+                    "default": "Shop all"
+                },
+                {
+                    "type": "url",
+                    "id": "link",
+                    "label": "Link"
+                },
+                {
+                    "type": "header",
+                    "content": "Button 2"
+                },
+                {
+                    "type": "select",
+                    "id": "link_style_2",
+                    "label": "Button style",
+                    "options": [
+                        {
+                            "value": "c-btn c-btn--primary",
+                            "label": "Solid button (brand)"
+                        },
+                        {
+                            "value": "c-btn c-btn--mono",
+                            "label": "Solid button (mono)"
+                        },
+                        {
+                            "value": "c-btn c-btn--hollow",
+                            "label": "Outline button"
+                        }
+                    ],
+                    "default": "c-btn c-btn--primary"
+                },
+                {
+                    "type": "text",
+                    "id": "link_title_2",
+                    "label": "Label",
+                    "default": "Shop new"
+                },
+                {
+                    "type": "url",
+                    "id": "link_2",
+                    "label": "Link"
+                }
+            ]
+        }
+    ],
+    "presets": [
+        {
+            "name": "Slideshow",
+            "settings": {
+                "autoplay": true,
+                "autoplay_speed": 8
+            },
+            "blocks": [
+                {
+                    "type": "image"
+                },
+                {
+                    "type": "image"
+                }
+            ]
+        }
+    ],
+    "enabled_on": {
+        "templates": ["*"],
+        "groups": ["footer"]
+    }
+}
+{% endschema %}

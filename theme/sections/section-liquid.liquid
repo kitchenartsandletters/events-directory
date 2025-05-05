@@ -1,0 +1,25 @@
+{{ section.settings.custom_liquid }}
+
+{% schema %}
+{
+    "name": "Custom Liquid",
+    "tag": "section",
+    "class": "js-section__liquid",
+    "settings": [
+        {
+            "type": "liquid",
+            "id": "custom_liquid",
+            "label": "Custom Liquid"
+        }
+    ],
+    "presets": [
+        {
+            "name": "Custom Liquid"
+        }
+    ],
+    "enabled_on": {
+        "templates": ["*"],
+        "groups": ["header", "footer"]
+    }
+}
+{% endschema %}

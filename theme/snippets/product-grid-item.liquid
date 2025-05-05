@@ -1,0 +1,955 @@
+{% comment %}theme-check-disable RemoteAsset, TemplateLength{% endcomment %}
+{% comment %}
+    Render product card
+
+    Accepts:
+    - id: {String} Unique id of the item. By default section.id--product.id is used (optional)
+    - product: {Object} Product object
+    - collection: {Object} Collection if product is within one
+    - image_ratio: {String} Image ratio string. Values are "1:1", "3:4", "4:3", "16:9", "2:3", "natural"
+    - image_sizes: {String} Image sizes attribute string
+    - fit_image_to_container: {Boolean} Fit image into container, or resize (optional)
+    - small_buttons_on_mobile: {Boolean} Small buttons on the image grid @ mobile size
+    - enable_quick_shop: {Boolean} Enable quick shop (optional)
+    - quick_shop_trigger: {String} button, button-hover, icon, icon-hover (optional)
+    - hide_labels: {Boolean} Hide card labels (optional)
+{% endcomment %}
+
+<style>
+.burst {
+    background: #00008F;
+    display:inline-block;
+    width: 4.8em;
+    height: 4.8em;
+    padding-top:.4em;
+    margin-top: -80px;
+    margin-left: 30px;
+    padding-bottom: 0;
+    position: absolute;
+    text-align: center;   
+    color:white;
+    text-decoration:none;
+  text-shadow: 0 .125em 0 #993333;
+    tansition: transform 1s;
+    -moz-transition: -ms-transform 1s;
+    -webkit-transition: -webkit-transform 1s;
+      -webkit-transform: rotate(-11deg);
+       -moz-transform: rotate(-11deg);
+        -ms-transform: rotate(-11deg);
+  
+  font-size:.7em;
+  line-height: 0.9;
+  left:0;
+  -webkit-font-smoothing: antialiased;
+  /* corects font smoothing from switching durring transition*/
+  letter-spacing: 0;
+  
+-webkit-box-shadow: 0 0 1em -.25em #00008F;
+-moz-box-shadow: 0 0 1em -.25em #00008F;
+box-shadow: 0 0 1em -.25em #00008F;
+
+}
+.burst:before, 
+.burst:after {
+     content: "";
+    position:absolute;
+    top: 0;
+    left: 0;
+    height: 4.8em;
+    width: 4.8em;
+    background: #00008F;
+  	z-index:-2;
+    -webkit-box-shadow: 0 1em -.25em #00008F;
+	   -moz-box-shadow: 0 0 1em -.25em  #00008F;
+	        box-shadow: 0 0 1em -.25em #00008F;
+}
+.burst:before {
+      -webkit-transform: rotate(30deg);
+       -moz-transform: rotate(30deg);
+        -ms-transform: rotate(30deg);
+}
+.burst:after {
+	  -webkit-transform: rotate(60deg);
+       -moz-transform: rotate(60deg);
+        -ms-transform: rotate(60deg);
+}
+
+
+/*
+.burst:hover{    
+        -webkit-animation: spin 1s linear;
+        -moz-animation: spin 1s linear;       
+}
+
+@-webkit-keyframes spin {
+	0%  {-webkit-transform: rotate(0deg);}
+	100% {-webkit-transform: rotate(360deg);}	
+}
+
+@-moz-keyframes spin {
+	0%  {-moz-transform: rotate(0deg);}
+	100% {-moz-transform: rotate(360deg);}	
+*/
+
+}
+</style>
+
+{%- liquid
+    assign current_variant = product.selected_or_first_available_variant
+
+    unless image_ratio
+        assign image_ratio = settings.product_grid_image_size
+    endunless
+
+    if fit_image_to_container == nil
+        assign fit_image_to_container = settings.product_grid_image_fit
+    endif
+
+    if enable_quick_shop == nil
+        assign enable_quick_shop = settings.quick_shop_enabled
+    endif
+
+    if quick_shop_trigger == nil
+        assign quick_shop_trigger = settings.quick_shop_trigger
+    endif
+
+    assign container_ratio = image_ratio
+    assign uncropped_image = true
+    if image_ratio != 'natural'
+        assign values = image_ratio | split: ':'
+        assign i_w = values[0] | plus: 0.0
+        assign i_h = values[1] | plus: 0.0
+        assign image_ratio = i_h | divided_by: i_w
+
+        unless fit_image_to_container
+            assign uncropped_image = false
+        endunless
+    endif
+
+    assign image_srcset_widths = '180, 360, 540, 720, 900, 1080, 1296, 1512'
+    assign image_srcset_widths_array = image_srcset_widths | split: ', '
+
+    unless image_sizes
+        assign image_sizes = '100vw'
+    endunless
+
+    comment
+        Quickshop settings
+    endcomment
+    if enable_quick_shop
+        assign quick_shop_trigger_split = quick_shop_trigger | split: "-"
+        assign quick_shop_trigger = quick_shop_trigger_split | first
+
+        assign quick_shop_hover_enabled = false
+        if quick_shop_trigger_split.size > 1
+            assign quick_shop_hover_enabled = true
+        endif
+
+        if quick_shop_trigger == 'icon'
+            assign render_quickshop = true
+        elsif product.variants.size > 1 and product.available and quick_shop_trigger == 'button'
+            assign render_quickshop = true
+        else
+            assign render_quickshop = false
+        endif
+
+        assign quick_shop_icon_hover = false
+        if quick_shop_trigger == 'icon' and quick_shop_hover_enabled
+            assign quick_shop_icon_hover = true
+        endif
+    else
+        assign quick_shop_trigger = nil
+    endif
+
+    comment
+        Process all imges (main and hover)
+    endcomment
+    if product.featured_media.preview_image != nil
+        assign image = product.featured_media.preview_image
+        assign image_srcset = ''
+
+        assign secondary_image = nil
+        if settings.product_grid_hover == 'image' and quick_shop_icon_hover == false and product.media[1] != blank
+            assign secondary_image = product.media[1].preview_image
+        elsif enable_quick_shop == false and settings.product_grid_hover == 'image' and product.media[1] != blank
+            assign secondary_image = product.media[1].preview_image
+        endif
+
+        for w in image_srcset_widths_array
+            assign width = w | plus: 0
+
+            if uncropped_image
+                assign height = width | divided_by: image.aspect_ratio | round
+            else
+                assign height = width | times: image_ratio | round
+            endif
+
+            if width > image.width or height > image.height
+                break
+            endif
+
+            if uncropped_image
+                assign image_url = image | image_url: width: width
+            else
+                assign image_url = image | image_url: width: width, height: height
+            endif
+            assign image_srcset = image_srcset | append: image_url | append: ' ' | append: width | append: 'w ' | append: height | append: 'h, '
+        endfor
+
+        assign master_width = image.width
+        if uncropped_image
+            assign master_height = image.height
+            assign master_image_url = image | image_url
+
+            assign default_height = default_width | divided_by: image.aspect_ratio | round
+            assign image_default_url = image | image_url: width: default_width
+        else
+            assign master_height = master_width | times: image_ratio | round
+            assign default_height = default_width | times: image_ratio | round
+            if master_height > image.height
+                assign master_height = image.height
+                assign master_width  = master_height | divided_by: image_ratio | round
+            endif
+            assign master_image_url = image | image_url: width: master_width, height: master_height
+            assign image_default_url = image | image_url: width: default_width, height: default_height
+        endif
+        assign image_srcset = image_srcset | append: master_image_url | append: ' ' | append: master_width | append: 'w ' | append: master_height | append: 'h'
+
+        assign default_width = 300
+        if default_width > image.width
+            assign default_width = image.width
+        endif
+        if uncropped_image
+            assign default_height = default_width | divided_by: image.aspect_ratio | round
+            assign image_default_url = image | image_url: width: default_width
+        else
+            assign default_height = default_width | times: image_ratio | round
+            if default_height > image.height
+                assign default_height = image.height
+                assign default_width  = default_height | divided_by: ratio | round
+            endif
+            assign image_default_url = image | image_url: width: default_width, height: default_height
+        endif
+
+        if secondary_image
+            assign secondary_image_srcset = ''
+            assign secondary_image_ratio = master_height | plus: 0.0 | divided_by: master_width
+            assign secondary_image_master_width = secondary_image.width
+            assign secondary_image_master_height = secondary_image_master_width | times: secondary_image_ratio | round
+
+            if secondary_image_master_height > secondary_image.height
+                assign secondary_image_master_height = secondary_image.height
+                assign secondary_image_master_width = secondary_image_master_height | divided_by: secondary_image_ratio | round
+            endif
+
+            for w in image_srcset_widths_array
+                assign width = w | plus: 0
+                assign height = width | times: secondary_image_ratio | round
+
+                if width > secondary_image_master_width or height > secondary_image_master_height
+                    break
+                endif
+
+                assign secondary_image_url = secondary_image | image_url: width: width, height: height
+                assign secondary_image_srcset = secondary_image_srcset | append: secondary_image_url | append: ' ' | append: width | append: 'w ' | append: height | append: 'h, '
+            endfor
+
+            assign secondary_master_image_url = secondary_image | image_url: width: secondary_image_master_width, height: secondary_image_master_height
+            assign secondary_image_srcset = secondary_image_srcset | append: secondary_master_image_url | append: ' ' | append: secondary_image_master_width | append: 'w ' | append: secondary_image_master_height | append: 'h'
+
+            assign secondary_image_default_width = 300
+            if secondary_image_default_width > secondary_image_master_width
+                assign secondary_image_default_width = secondary_image_master_width
+            endif
+
+            assign secondary_image_default_height = secondary_image_default_width | times: secondary_image_ratio | round
+            if secondary_image_default_height > secondary_image_master_height
+                assign secondary_image_default_height = secondary_image_master_height
+                assign secondary_image_default_width  = secondary_image_default_height | divided_by: secondary_image_ratio | round
+            endif
+            assign secondary_image_default_url = secondary_image | image_url: width: secondary_image_default_width, height: secondary_image_default_height
+        endif
+    endif
+-%}
+{%- if quick_shop_trigger == 'button' -%}
+    {%- capture quick_shop_trigger_button -%}
+        <div class="product-card-btn">
+
+            {% assign in_preorder_collection = false %}
+            {% assign in_pastop_collection = false %}
+
+            {% for collection in product.collections %}
+            {% if in_preorder_collection == false and collection.title == 'Preorder' %}
+            {% assign in_preorder_collection = true %}
+            {% endif %}
+                                                          
+            {% if in_pastop_collection == false and collection.title == 'Past Out-of-Print Offers' %}
+            {% assign in_pastop_collection = true %}
+            {% endif %}
+            {% endfor %}
+
+          
+            {% if product.available == false %}
+                <button type="submit" class="c-btn c-btn--full{% if settings.quick_shop_product_grid_button == 'outline' %} c-btn--hollow{% else %} c-btn--primary{% endif %} product-card-btn__btn {% if small_buttons_on_mobile %}c-btn--small@mobile{% endif %}" disabled="disabled">{{ 'products.product.sold_out' | t }}</button>
+            {% elsif product.variants.size > 1 %}
+                <a href="{{ product.url }}" class="c-btn c-btn--full{% if settings.quick_shop_product_grid_button == 'outline' %} c-btn--hollow{% else %} c-btn--primary{% endif %} {% if small_buttons_on_mobile %}c-btn--small@mobile{% endif %} product-card-btn__btn js-quickshop-trigger" aria-hidden="true" tabindex="-1">{{ 'products.product.select_options' | t }}</a>
+            {% else %}
+                {% form 'product', product, class: "js-product-form" %}
+                    <input type="hidden" name="id" value="{{ product.variants.first.id }}" />
+                    <button type="submit" name="add" class="c-btn c-btn--full{% if settings.quick_shop_product_grid_button == 'outline' %} c-btn--hollow{% else %} c-btn--primary{% endif %} {% if small_buttons_on_mobile %}c-btn--small@mobile{% endif %} product-card-btn__btn js-product-add {% if current_variant.inventory_quantity < 1 and collection.title != 'Past Out-of-Print Offers' and collection.title != 'Preorder' and product.available == true and product.type != 'Hats' and in_preorder_collection == false and product.type != 'GCP' and product.type != 'T-Shirt' and product.type != 'Event' %} backorder_button" {% endif %} aria-hidden="true" tabindex="-1">
+                        <span class="product-card-btn__text">
+                            <span class="js-product-add-text">
+                            {% comment %}
+                            {{ 'products.product.add_to_cart' | t }}
+                            {% endcomment %}
+                            {%- if current_variant.inventory_quantity < 1 and collection.title != 'Past Out-of-Print Offers' and collection.title != 'Preorder' and product.available == true and product.type != 'Hats' and  in_preorder_collection == false and product.type != 'GCP' and product.type != 'T-Shirt' and product.type != 'Event' -%}
+                            Backorder
+                            {%- elsif in_preorder_collection -%}
+            				Preorder
+                            {%- elsif product.available == false -%}
+                            Sold Out
+                            {%- else -%}
+                            Add to Cart
+                            {%- endif -%}
+                            </span>
+                        </span>
+                        <span class="product-card-btn__tick"><i class="icon icon--tick"></i></span>
+                        <span class="product-card-btn__spinner">
+                            <div class="theme-spinner">
+                                <div class="theme-spinner__border"></div>
+                                <div class="theme-spinner__border"></div>
+                                <div class="theme-spinner__border"></div>
+                                <div class="theme-spinner__border"></div>
+                            </div>
+                        </span>
+                    </button>
+                {% endform %}
+            {% endif %}
+
+        </div>
+    {%- endcapture -%}
+{%- endif -%}
+<div class="
+        product-card
+        product-card--{% if fit_image_to_container %}fit{% else %}crop{% endif %}
+        js-product
+        js-product-card
+        js-product-{{ product.id }}
+        {% unless product.available %}product-card--sold-out{% endunless %}
+        {% if product.compare_at_price > product.price and product.available %}product-card--sale{% endif %}
+        {% if settings.product_grid_align %}product-card--center{% else %}product-card--left{% endif %}
+        {% if page == 'home' %}home-products__item{% endif %}
+        {% if quick_shop_trigger %}product-card--trigger-{{ quick_shop_trigger }}{% endif %}
+        {% if quick_shop_hover_enabled %}product-card--hover{% endif %}
+    "
+    data-product-id="{{ product.id }}"
+>
+    {%- unless hide_labels -%}
+        {% render 'product-grid-label', product: product %}
+    {%- endunless -%}
+
+    <div class="product-card-top">
+
+        <div class="
+                o-ratio
+                o-ratio--{{ container_ratio }}
+            "
+            {% if product.featured_media.preview_image == null and image_ratio == 'natural' %}
+                style="padding-bottom:100%;"
+            {% elsif product.featured_media.preview_image != null and image_ratio == 'natural' %}
+                style="padding-bottom:{{ 1 | divided_by: product.featured_media.preview_image.aspect_ratio | times: 100 }}%;"
+            {% endif %}
+        >
+
+            <div class="o-ratio__content">
+                <a href="{{ product.url | within: collection }}" class="product-card__link product-card__link--full-opacity js-product-link{% if page == 'home' %} home-products__link{% endif %}" title="{{ product.title }}" tabindex="-1">
+
+                    <div class="product-card__media{% if secondary_image %} product-card__media--hover-image{% elsif settings.product_grid_hover == 'zoom' %} product-card__media--hover-zoom{% endif %}">
+
+                        <product-card-spinner class="product-card__spinner product-card__spinner--grid">
+                            <div class="product-card__spin-border"></div>
+                            <div class="product-card__spin-border"></div>
+                            <div class="product-card__spin-border"></div>
+                            <div class="product-card__spin-border"></div>
+                        </product-card-spinner>
+
+                        {% if secondary_image %}
+                            <img
+                                class="product-card__img-hover hover-enabled js-img-grid-hover"
+                                src="{{ secondary_image_default_url }}"
+                                srcset="{{ secondary_image_srcset }}"
+                                sizes="{{ image_sizes }}"
+                                width="{{ secondary_image_default_width }}"
+                                height="{{ secondary_image_default_height }}"
+                                alt="{{ secondary_image.alt | escape }}"
+                                loading="lazy"
+                            />
+                        {% endif %}
+
+                        {% if image == null %}
+                            {% comment %} TODO: Check if placeholder needs same logic as main images {% endcomment %}
+                            {%- liquid
+                                assign image_width = 300
+                                assign image_height = 300
+                                assign image_alt = "Placeholder image"
+                            -%}
+                            <img
+                                class="product-card__img js-img-grid"
+                                src="{{ 'placeholder.png' | asset_img_url: '300x' }}"
+                                srcset="{{ 'placeholder.png' | asset_img_url: '180x' }} 180w 180h,
+                                        {{ 'placeholder.png' | asset_img_url: '360x' }} 360w 360h,
+                                        {{ 'placeholder.png' | asset_img_url: '540x' }} 540w 540h,
+                                        {{ 'placeholder.png' | asset_img_url: '720x' }} 720w 720h,
+                                        {{ 'placeholder.png' | asset_img_url: '900x' }} 900w 900h,
+                                        {{ 'placeholder.png' | asset_img_url: '1080x' }} 1080w 1080h,
+                                        {{ 'placeholder.png' | asset_img_url: '1296x' }} 1296w 1296h,
+                                        {{ 'placeholder.png' | asset_img_url: '1512x' }} 1512w 1512h
+                                        "
+                                sizes="{{ image_sizes }}"
+                                width="{{ image_width }}"
+                                height="{{ image_height }}"
+                                alt="{{ image_alt }}"
+                                loading="lazy"
+                            />
+                        {% else %}
+                            {%- liquid
+                                assign image_width = default_width
+                                assign image_height = default_height
+                                assign image_alt = image.alt | escape
+                            -%}
+                            <img
+                                class="product-card__img js-img-grid{% if settings.product_grid_hover == 'image' %} hover-enabled{% endif %}"
+                                src="{{ image_default_url }}"
+                                srcset="{{ image_srcset }}"
+                                sizes="{{ image_sizes }}"
+                                width="{{ image_width }}"
+                                height="{{ image_height }}"
+                                alt="{{ image_alt }}"
+                                loading="lazy"
+                            />
+                        {% endif %}
+
+                        {%- liquid
+                            assign alt = 'general.media.loading_image' | t: alt: image_alt
+                        -%}
+                        {% render 'image-skeleton',
+                            alt: alt,
+                            width: image_width,
+                            height: image_height
+                        %}
+
+                        {%- if product.tags contains 'cclub' %}
+                              <div class="burst">KAL COOK BOOK CLUB</div>
+                        {%- endif %}
+                      
+                    </div>
+
+                </a>
+            </div>
+        </div>
+        {%- unless collection.title == 'Past Out-of-Print Offers' or product.tags contains 'pastop' -%}
+        {%- if quick_shop_trigger == 'button' -%}
+            {{ quick_shop_trigger_button }}
+        {%- endif -%}
+        {%- endunless -%}
+        {% if quick_shop_trigger == 'icon' %}
+            <button class="quick-shop__trigger js-quickshop-trigger" aria-hidden="true" tabindex="-1">
+                {% render 'icon-quickbuy' %}
+            </button>
+        {% endif %}
+
+    </div>
+
+    <div class="product-card__details">
+
+        <a href="{{ product.url | within: collection }}" class="product-card__link js-product-link" title="{{ product.title }}" aria-label="link opens product page">
+
+            {% if settings.product_grid_vendor %}
+                <p class="product-card__vendor u-medium-small h3">{{ product.vendor }}</p>
+            {% endif %}
+
+            <h3 class="product-card__title f-family--{{ settings.type_grid_style }} f-caps--{{ settings.type_grid_capitalize }} f-space--{{ settings.type_grid_letterspace }}">{{ product.title }}</h3>
+                           {% unless product.type == 'Event' %}             <div class="fproduct-sku" aria-label="Book Author Name">{{ "by " | append: current_variant.sku }}</div>{% endunless %}
+        </a>
+
+        <div class="product-card__details__hover u-medium">
+
+            <a href="{{ product.url | within: collection }}" class="product-card__link js-product-link" title="{{ product.title }}" tabindex="-1">
+
+                {% if settings.product_grid_price %}
+                    <p class="price">
+                        {% render 'product-price',
+                            product: product,
+                            from_price: true,
+                            show_price_notes: false
+                        %}
+                    </p>
+
+                    {% if product.available and product.selected_or_first_available_variant.unit_price_measurement %}
+                        <p class="price__notes">
+                            <span class="price__note price__note--unit">
+                            {% render 'product-unit-price', product: product, variant: product.selected_or_first_available_variant %}
+                            </span>
+                        </p>
+                    {% endif %}
+                {% endif %}
+
+                {%- if settings.product_grid_reviews and product.metafields.reviews.rating.value != blank -%}
+
+                      {% liquid
+                        assign rating_decimal = 0
+                        assign decimal = product.metafields.reviews.rating.value.rating | modulo: 1
+                        if decimal >= 0.3 and decimal <= 0.7
+                          assign rating_decimal = 0.5
+                        elsif decimal > 0.7
+                          assign rating_decimal = 1
+                        endif
+                      %}
+
+                      <div class="review-wrapper">
+
+                          <div class="rating" role="img" aria-label="{{ 'accessibility.star_reviews_info' | t: rating_value: product.metafields.reviews.rating.value, rating_max: product.metafields.reviews.rating.value.scale_max }}">
+                            <span aria-hidden="true" class="rating-star color-icon-{{ settings.accent_icons }}" style="--rating: {{ product.metafields.reviews.rating.value.rating | floor }}; --rating-max: {{ product.metafields.reviews.rating.value.scale_max }}; --rating-decimal: {{ rating_decimal }};"></span>
+                          </div>
+
+                          <div class="review-text-wrapper">
+
+                              <p class="rating-text caption">
+                                <span aria-hidden="true">{{ product.metafields.reviews.rating.value }} / {{ product.metafields.reviews.rating.value.scale_max }}</span>
+                              </p>
+
+                              <p class="rating-count u-small caption">
+                                <span aria-hidden="true">({{ product.metafields.reviews.rating_count }})</span>
+                                <span class="visually-hidden">{{ product.metafields.reviews.rating_count }}</span>
+                              </p>
+
+                          </div>
+
+                      </div>
+
+                {%- endif -%}
+
+            </a>
+
+            {% if settings.product_grid_show_swatches %}
+                {% render 'product-options',
+                    component_type: 'grid',
+                    product: product
+                %}
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    {% if render_quickshop %}
+        {%- liquid
+
+            unless id
+                assign id = section.id | append: '--' | append: product.id
+            endunless
+            comment
+                Process first variant image
+            endcomment
+            assign quick_shop_image = product.selected_or_first_available_variant.featured_media.preview_image
+            if quick_shop_image != nil
+                assign image = quick_shop_image
+                assign image_srcset = ''
+
+                for w in image_srcset_widths_array
+                    assign width = w | plus: 0
+
+                    if uncropped_image
+                        assign height = width | divided_by: image.aspect_ratio | round
+                    else
+                        assign height = width | times: image_ratio | round
+                    endif
+
+                    if width > image.width or height > image.height
+                        break
+                    endif
+
+                    if uncropped_image
+                        assign image_url = image | image_url: width: width
+                    else
+                        assign image_url = image | image_url: width: width, height: height
+                    endif
+                    assign image_srcset = image_srcset | append: image_url | append: ' ' | append: width | append: 'w ' | append: height | append: 'h, '
+                endfor
+
+                assign master_width = image.width
+                if uncropped_image
+                    assign master_height = image.height
+                    assign master_image_url = image | image_url
+
+                    assign default_height = default_width | divided_by: image.aspect_ratio | round
+                    assign image_default_url = image | image_url: width: default_width
+                else
+                    assign master_height = master_width | times: image_ratio | round
+                    assign default_height = default_width | times: image_ratio | round
+                    if master_height > image.height
+                        assign master_height = image.height
+                        assign master_width  = master_height | divided_by: image_ratio | round
+                    endif
+                    assign master_image_url = image | image_url: width: master_width, height: master_height
+                    assign image_default_url = image | image_url: width: default_width, height: default_height
+                endif
+                assign image_srcset = image_srcset | append: master_image_url | append: ' ' | append: master_width | append: 'w ' | append: master_height | append: 'h'
+
+                assign default_width = 300
+                if default_width > image.width
+                    assign default_width = image.width
+                endif
+                if uncropped_image
+                    assign default_height = default_width | divided_by: image.aspect_ratio | round
+                    assign image_default_url = image | image_url: width: default_width
+                else
+                    assign default_height = default_width | times: image_ratio | round
+                    if default_height > image.height
+                        assign default_height = image.height
+                        assign default_width  = default_height | divided_by: ratio | round
+                    endif
+                    assign image_default_url = image | image_url: width: default_width, height: default_height
+                endif
+            endif
+
+
+        -%}
+
+        <quick-shop class="section--{{ id }} quick-shop--drawer-{{ settings.color_drawer_style }}" data-product-url="{{ product.url }}">
+
+            <div class="quick-shop__overlay"></div>
+
+            <div class="quick-shop__wrapper">
+                <div class="product-card__wrapper">
+
+                    {% render 'product-grid-label', product: product %}
+
+                    <div class="product-card__media product-card__media--modal{% if secondary_image %} product-card__media--hover-image{% elsif settings.product_grid_hover == 'zoom' %} product-card__media--hover-zoom{% endif %}">
+                        <div class="
+                                o-ratio o-ratio--modal
+                                o-ratio--{{ container_ratio }}
+                            "
+                            {% if product.featured_media.preview_image == null and image_ratio == 'natural' %}
+                                style="padding-bottom:100%;"
+                            {% elsif product.featured_media.preview_image != null and image_ratio == 'natural' %}
+                                style="padding-bottom:{{ 1 | divided_by: product.featured_media.preview_image.aspect_ratio | times: 100 }}%;"
+                            {% endif %}>
+                            <div class="o-ratio__content">
+                                <product-card-spinner class="product-card__spinner product-card__spinner--modal">
+                                    <div class="product-card__spin-border"></div>
+                                    <div class="product-card__spin-border"></div>
+                                    <div class="product-card__spin-border"></div>
+                                    <div class="product-card__spin-border"></div>
+                                </product-card-spinner>
+
+                                <a href="{{ product.url | within: collection }}" class="product-card__link product-card__link--full-opacity js-product-link{% if page == 'home' %} home-products__link{% endif %}" title="{{ product.title }}" tabindex="-1">
+
+                                    {% if image == null %}
+                                        {%- liquid
+                                            assign image_width = 300
+                                            assign image_height = 300
+                                            assign image_alt = "Placeholder image"
+                                        -%}
+                                        <img
+                                            class="product-card__img js-img-modal"
+                                            src="{{ 'placeholder.png' | asset_img_url: '300x' }}"
+                                            srcset="{{ 'placeholder.png' | asset_img_url: '180x' }} 180w 180h,
+                                                    {{ 'placeholder.png' | asset_img_url: '360x' }} 360w 360h,
+                                                    {{ 'placeholder.png' | asset_img_url: '540x' }} 540w 540h,
+                                                    {{ 'placeholder.png' | asset_img_url: '720x' }} 720w 720h,
+                                                    {{ 'placeholder.png' | asset_img_url: '900x' }} 900w 900h,
+                                                    {{ 'placeholder.png' | asset_img_url: '1080x' }} 1080w 1080h,
+                                                    {{ 'placeholder.png' | asset_img_url: '1296x' }} 1296w 1296h,
+                                                    {{ 'placeholder.png' | asset_img_url: '1512x' }} 1512w 1512h
+                                                    "
+                                            sizes="{{ image_sizes }}"
+                                            width="{{ image_width }}"
+                                            height="{{ image_height }}"
+                                            alt="{{ image_alt }}"
+                                            loading="lazy"
+                                        />
+                                    {% else %}
+                                        {%- liquid
+                                            assign image_width = default_width
+                                            assign image_height = default_height
+                                            assign image_alt = image.alt | escape
+                                        -%}
+                                        <img
+                                            class="product-card__img js-img-modal"
+                                            src="{{ image_default_url }}"
+                                            srcset="{{ image_srcset }}"
+                                            sizes="{{ image_sizes }}"
+                                            width="{{ image_width }}"
+                                            height="{{ image_height }}"
+                                            alt="{{ image_alt }}"
+                                            loading="lazy"
+                                        />
+                                    {% endif %}
+
+                                    {%- liquid
+                                        assign alt = 'general.media.loading_image' | t: alt: image_alt
+                                    -%}
+                                    {% render 'image-skeleton',
+                                        alt: image_alt,
+                                        width: image_width,
+                                        height: image_height
+                                    %}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="product-card__details">
+                        <a href="{{ product.url | within: collection }}" class="product-card__link js-product-link" title="{{ product.title }}">
+                            {% if settings.product_grid_vendor %}
+                                <p class="product-card__vendor u-medium-small">{{ product.vendor }}</p>
+                            {% endif %}
+                            <h3 class="product-card__title f-family--{{ settings.type_grid_style }} f-caps--{{ settings.type_grid_capitalize }} f-space--{{ settings.type_grid_letterspace }}">{{ product.title }}</h3>
+                        </a>
+
+                        <div class="product-card__details__hover u-medium">
+                            <a href="{{ product.url | within: collection }}" class="product-card__link js-product-link" title="{{ product.title }}" tabindex="-1">
+
+                                {%- liquid
+                                    assign price_id = 'price-' | append: id
+                                -%}
+                                {% render 'product-price',
+                                    product: product,
+                                    id: price_id,
+                                    show_price_notes: false,
+                                    use_variant: true,
+                                    from_price: false
+                                %}
+
+
+                                {%- if settings.product_grid_reviews and product.metafields.reviews.rating.value != blank -%}
+
+                                    {%- liquid
+                                        assign rating_decimal = 0
+                                        assign decimal = product.metafields.reviews.rating.value.rating | modulo: 1
+                                        if decimal >= 0.3 and decimal <= 0.7
+                                        assign rating_decimal = 0.5
+                                        elsif decimal > 0.7
+                                        assign rating_decimal = 1
+                                        endif
+                                    -%}
+
+                                    <div class="review-wrapper">
+                                        <div class="rating" role="img" aria-label="{{ 'accessibility.star_reviews_info' | t: rating_value: product.metafields.reviews.rating.value, rating_max: product.metafields.reviews.rating.value.scale_max }}">
+                                            <span aria-hidden="true" class="rating-star color-icon-{{ settings.accent_icons }}" style="--rating: {{ product.metafields.reviews.rating.value.rating | floor }}; --rating-max: {{ product.metafields.reviews.rating.value.scale_max }}; --rating-decimal: {{ rating_decimal }};"></span>
+                                        </div>
+                                        <div class="review-text-wrapper">
+                                            <p class="rating-text caption">
+                                                <span aria-hidden="true">{{ product.metafields.reviews.rating.value }} / {{ product.metafields.reviews.rating.value.scale_max }}</span>
+                                            </p>
+                                            <p class="rating-count u-small caption">
+                                                <span aria-hidden="true">({{ product.metafields.reviews.rating_count }})</span>
+                                                <span class="visually-hidden">{{ product.metafields.reviews.rating_count }}</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                {%- endif -%}
+                            </a>
+                        </div>
+                        <div class="product-card__more u-small">
+                            <a href="{{ product.url | within: collection }}" class="product-card-details js-view-details" title="{{ product.title }}">{{ 'general.quickshop.view_details' | t }}</a>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="product-form__divider">
+
+                {%- liquid
+                    if product.variants.size == 1 and product.variants.first.title contains 'Default'
+                        assign hide_default_title = true
+                    else
+                        assign hide_default_title = false
+                    endif
+
+                    assign product_form_id = 'product-form-' | append: id
+                -%}
+
+                {% form 'product', product, class: "product-form product-form--card js-product-form", id: product_form_id, show-cart: settings.quick_shop_show_cart %}
+
+                    <div class="product-form__content">
+                        <input type="hidden" name="id" value="{{ current_variant.id }}" disabled>
+                        {% for variant in product.variants %}
+                            <input type="hidden" id="quantity-{{ id }}-{{ variant.id }}" data-qty="{{ variant.inventory_quantity }}" disabled>
+                        {% endfor %}
+
+                        <div class="price__notes">
+                            <p id="unit-price-{{ id }}" class="price__note price__note--unit">
+                                {%- if current_variant.unit_price -%}
+                                {% render 'product-unit-price', product: product, variant: current_variant %}
+                                {%- endif -%}
+                            </p>
+                            {%- if cart.taxes_included -%}
+                                <p class="price__note price__note--tax">
+                                    {{ 'products.general.include_taxes' | t }}
+                                </p>
+                            {%- endif -%}
+                            {%- if shop.shipping_policy.body != blank -%}
+                                <p class="price__note price__note--tax">
+                                    {{ 'products.general.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+                                </p>
+                            {%- endif -%}
+                        </div>
+
+                        {%- unless hide_default_title -%}
+                            <div class="product-form__variant js-product-form-variants product-form__variant--{{ settings.quick_shop_variant_style }}">
+                                <div class="product-form__swatches">
+                                    {% render 'product-options',
+                                        product: product,
+                                        section_id: section.id,
+                                        card_id: id,
+                                        component_type: 'form',
+                                        style: settings.quick_shop_variant_style,
+                                        product_form_id: product_form_id
+                                    %}
+                                </div>
+                            </div>
+                        {%- endunless -%}
+
+                        {% if settings.quick_shop_quantity_selector %}
+                            <div class="product-form__qty">
+                                <label for="Quantity" class="quantity-selector f-family--{{ settings.type_product_form_headings_style }} f-caps--{{ settings.type_product_form_headings_capitalize }} f-space--{{ settings.type_product_form_headings_letterspace }}">{{ 'products.product.quantity' | t }}</label>
+                                <div class="product-form__qty-input">
+                                    <input type="number" id="Quantity" name="quantity" value="1" min="1" class="quantity-selector js-qty-input">
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if settings.quick_shop_inventory_notice %}
+                            <div id="inventory-notice-{{ id }}" data-inventory-limit="{{ settings.quick_shop_inventory_limit }}" data-show-qty="{{ settings.quick_shop_inventory_show_qty }}">
+
+                                {% liquid
+                                    if current_variant.available == false
+                                        assign qty_sold = true
+                                    else
+                                        assign qty_sold = false
+
+                                        if current_variant.inventory_management == "shopify" and settings.quick_shop_inventory_show_qty
+                                            assign qty_number = true
+                                        else
+                                            assign qty_number = false
+                                        endif
+
+                                        if current_variant.inventory_management == "shopify"
+                                            if current_variant.inventory_quantity <= settings.quick_shop_inventory_limit
+                                                assign qty_low = true
+                                            else
+                                                assign qty_low = false
+                                            endif
+                                        else
+                                            assign qty_low = false
+                                        endif
+
+                                    endif
+                                %}
+
+                                <div class="
+                                    product-form__stock-note
+                                    u-flex
+                                    u-flex--middle
+                                    {% if qty_sold %}
+                                        product-form__stock-note--sold
+                                    {% else %}
+                                        product-form__stock-note--in-stock
+                                        {% if qty_low %}
+                                            product-form__stock-note--low
+                                        {% endif %}
+                                    {% endif %}
+                                    ">
+
+                                    <div class="
+                                        pulsating-dot
+                                        product-form__stock-note-dot
+                                        ">
+                                        <div class="pulsating-dot__ring"></div>
+                                        <div class="pulsating-dot__circle"></div>
+                                    </div>
+
+                                    <p class="product-form__stock-note-text">
+                                        {%- if qty_sold -%}
+                                            {{ 'products.product.qty_notice_sold_out' | t }}
+                                        {%- else -%}
+                                            {%- if qty_number -%}
+                                                {%- if qty_low -%}
+                                                    {{ 'products.product.qty_notice_number_low_stock_html' | t: count: current_variant.inventory_quantity }}
+                                                {%- else -%}
+                                                    {{ 'products.product.qty_notice_number_in_stock_html' | t: count: current_variant.inventory_quantity }}
+                                                {%- endif -%}
+                                            {%- else -%}
+                                                {%- if qty_low -%}
+                                                    {{ 'products.product.qty_notice_low_stock' | t }}
+                                                {%- else -%}
+                                                    {{ 'products.product.qty_notice_in_stock' | t }}
+                                                {%- endif -%}
+                                            {%- endif -%}
+                                        {%- endif -%}
+                                    </p>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div
+                        class="
+                            product-form__add
+                            js-product-buttons
+                            {% if settings.quick_shop_payment_button %}product-form__add--dynamic{% endif %}
+                            {% if current_variant.available == false %}is-disabled{% endif %}
+                        "
+                    >
+
+                        <button
+                            type="submit"
+                            name="add"
+                            class="
+                                c-btn
+                                c-btn--full
+                                {% if settings.quick_shop_payment_button %}c-btn--hollow{% else %}c-btn--primary{% endif %}
+                                product-form__add-btn
+                                js-product-add
+                            "
+                            {% if current_variant.available == false %}disabled{% endif %}
+                        >
+                            <span class="product-form__add-btn__text">
+                                <span class="js-product-add-text">
+                                    {%- if current_variant.available -%}
+                                        {{ 'products.product.add_to_cart' | t }}
+                                    {%- else -%}
+                                        {{ 'products.product.sold_out' | t }}
+                                    {%- endif -%}
+                                </span>
+                            </span>
+                            <span class="product-form__add-btn__tick" role="presentation"><i class="icon icon--tick" role="presentation"></i></span>
+                            <span class="product-form__add-btn__spinner">
+                                <div class="theme-spinner">
+                                    <div class="theme-spinner__border"></div>
+                                    <div class="theme-spinner__border"></div>
+                                    <div class="theme-spinner__border"></div>
+                                    <div class="theme-spinner__border"></div>
+                                </div>
+                            </span>
+                        </button>
+
+                        {%- if settings.quick_shop_payment_button -%}
+                            {{ form | payment_button }}
+                        {%- endif -%}
+                    </div>
+                {% endform %}
+
+                <button class="quick-shop__close" title="Close (Esc)" type="button" aria-label="close">
+                    <i class="icon icon--close-l"></i>
+                </button>
+            </div>
+
+            <script type="application/json" id="ProductJson-{{ id }}">
+                {{ product | json }}
+            </script>
+        </quick-shop>
+    {% endif %}
+
+</div>

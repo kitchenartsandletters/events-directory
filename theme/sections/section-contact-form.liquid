@@ -1,0 +1,227 @@
+<section class="section section-contact-form section--{{ section.id }}{% if section.settings.section-bottom-margin %} section--mb-0{% endif %}" data-section-id="{{ section.id }}" data-section-type="contact-form">
+    <div class="contact-form contact-form--bg-{{ section.settings.background }} contact-form--divider-{{ section.settings.divider }}">
+        <div class="container container--tiny container--mob-0">
+
+            {% unless section.settings.heading == blank %}
+                <div class="section__title section__title--center">
+                    <h2 class="section__title-text">{{ section.settings.heading }}</h2>
+                </div>
+            {% endunless %}
+
+            {% form 'contact', class: "contact-form__form" %}
+                {% if form.posted_successfully? %}
+                    <p class="contact-form__note form-success">{{ 'contact.form.post_success' | t }}</p>
+                {% endif %}
+
+                {{ form.errors | default_errors }}
+
+                <div class="o-layout">
+                    <div class="o-layout__item u-1/1 u-1/2@tab">
+                        <label for="ContactFormName">{{ 'contact.form.name' | t }}</label>
+                        <input type="text" id="ContactFormName" name="contact[name]" value="{% if form[name] %}{{ form[name] }}{% elsif customer %}{{ customer.name }}{% endif %}">
+                    </div>
+                    <div class="o-layout__item u-1/1 u-1/2@tab">
+                        <label for="ContactFormEmail" class="{% if form.errors contains 'email' %}label--error{% endif %}">{{ 'contact.form.email' | t }}</label>
+                        <input type="email" id="ContactFormEmail" name="contact[email]" autocorrect="off" autocapitalize="off" value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}" class="{% if form.errors contains 'email' %}input--error{% endif %}">
+                    </div>
+
+
+                    {%- for block in section.blocks -%}
+                        {%- case block.type -%}
+                        {%- when 'text' -%}
+
+                            {%- if block.settings.label != blank -%}
+                                <div class="o-layout__item u-1/1" {{ block.shopify_attributes }}>
+
+                                    <label for="ContactForm-{{ block.id }}">{{ block.settings.label }}</label>
+
+                                    <{% if block.settings.long %}textarea {% else %}input {% endif %}
+                                        {% if block.settings.required %}required{% endif %}
+                                        id="ContactForm-{{ block.id }}"
+                                        name="contact[{{ block.settings.label }}]"
+                                        type="text" >
+                                    {%- if block.settings.long -%}</textarea>{%- endif -%}
+
+                                </div>
+                            {%- endif -%}
+
+                        {%- when 'checkbox' -%}
+
+                            {%- if block.settings.label != blank -%}
+                                <div class="o-layout__item u-1/1" {{ block.shopify_attributes }}>
+                                    <fieldset>
+                                        <input type="hidden" name="contact[{{ block.settings.label }}]" value="{{ block.settings.no }}">
+
+                                        <input
+                                        {% if block.settings.required %}required{% endif %}
+                                        id="ContactForm-{{ block.id }}"
+                                        class="checkbox"
+                                        type="checkbox"
+                                        name="contact[{{ block.settings.label }}]"
+                                        value="{{ block.settings.yes }}">
+
+                                        <label for="ContactForm-{{ block.id }}" class="checkbox-label">{{ block.settings.label }}</label>
+                                    </fieldset>
+                                </div>
+                            {%- endif -%}
+
+                        {%- when 'dropdown' -%}
+
+                            {%- if block.settings.label != blank -%}
+
+                                {% assign options = block.settings.options | split: ", " %}
+
+                                <div class="o-layout__item u-1/1" {{ block.shopify_attributes }}>
+
+                                     <div class="selector-wrapper selector-wrapper--standalone-labels">
+
+                                        <label for="ContactForm-{{ block.id }}" class="contact-form__dropdown-label">{{ block.settings.label }}</label>
+
+                                        <select class="contact-form__dropdown"
+                                        id="ContactForm-{{ block.id }}"
+                                        name="contact[{{ block.settings.label }}]">
+                                            {% for option in options %}
+                                                <option value="{{ option }}">{{ option }}</option>
+                                            {% endfor %}
+                                        </select>
+
+                                    </div>
+
+                                </div>
+                            {%- endif -%}
+
+                        {%- endcase -%}
+                    {%- endfor -%}
+
+                    <div class="o-layout__item u-1/1">
+                        <label for="ContactFormMessage">{{ 'contact.form.message' | t }}</label>
+                        <textarea rows="10" id="ContactFormMessage" name="contact[body]">{% if form.body %}{{ form.body }}{% endif %}</textarea>
+                    </div>
+
+                    <div class="o-layout__item u-1/1">
+                        <input type="submit" class="c-btn c-btn--primary c-btn--center c-btn--full u-mt- u-mb-" value="{{ 'contact.form.send' | t }}">
+                    </div>
+
+                </div>
+            {% endform %}
+
+        </div>
+    </div>
+</section>
+
+{% schema %}
+{
+    "name": "Contact form",
+    "class": "js-section__contact-form",
+    "settings": [
+        {
+            "id": "heading",
+            "type": "text",
+            "label": "Heading",
+            "default": "Send us an email"
+        },
+        {
+            "type": "checkbox",
+            "id": "background",
+            "label": "Show background color",
+            "default": true
+        },
+        {
+            "type": "checkbox",
+            "id": "divider",
+            "label": "Show dividing line",
+            "default": false
+        },
+        {
+            "type": "checkbox",
+            "id": "section-bottom-margin",
+            "label": "Reduce bottom margin",
+            "default": false
+        }
+    ],
+    "blocks": [
+        {
+            "type": "text",
+            "name": "Text field",
+            "settings": [
+                {
+                    "type": "checkbox",
+                    "id": "required",
+                    "label": "Required",
+                    "default": false
+                },
+                {
+                    "type": "checkbox",
+                    "id": "long",
+                    "label": "Allow long text",
+                    "default": false
+                },
+                {
+                    "type": "text",
+                    "id": "label",
+                    "label": "Label",
+                    "default": "Text field"
+                }
+            ]
+        },
+        {
+            "type": "checkbox",
+            "name": "Checkbox",
+            "settings": [
+                {
+                    "type": "checkbox",
+                    "id": "required",
+                    "label": "Required",
+                    "default": false
+                },
+                {
+                    "type": "text",
+                    "id": "label",
+                    "label": "Label",
+                    "default": "Checkbox"
+                },
+                {
+                    "type": "text",
+                    "id": "yes",
+                    "label": "Checked value",
+                    "default": "Yes"
+                },
+                {
+                    "type": "text",
+                    "id": "no",
+                    "label": "Unchecked value",
+                    "default": "No"
+                }
+            ]
+        },
+        {
+            "type": "dropdown",
+            "name": "Dropdown",
+            "settings": [
+                {
+                    "type": "text",
+                    "id": "label",
+                    "label": "Label",
+                    "default": "Dropdown"
+                },
+                {
+                    "type": "text",
+                    "id": "options",
+                    "label": "Options",
+                    "default": "Value 1, Value 2, Value 3",
+                    "info": "Separate your options with a comma."
+                }
+            ]
+        }
+    ],
+    "presets": [
+        {
+            "name": "Contact form"
+        }
+    ],
+    "enabled_on": {
+        "templates": ["*"],
+        "groups": ["footer"]
+    }
+}
+{% endschema %}

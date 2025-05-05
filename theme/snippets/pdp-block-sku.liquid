@@ -1,0 +1,13 @@
+{% comment %}
+    Renders product page SKU block
+
+    Accepts:
+    - variant-sku: {String}
+    - label: {String}
+{% endcomment %}
+
+{%- if variant-sku != blank -%}
+    <div class="product-form__swatch__title u-medium-small">
+        {%- if label != blank -%}{{ label }}&nbsp;{%- endif -%}<span class="product-form__swatch__sub-title">{{ variant-sku }}</span>
+    </div>
+{%- endif -%}

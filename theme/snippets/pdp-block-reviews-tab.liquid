@@ -1,0 +1,32 @@
+{% comment %}
+    Renders product collapsible reviews tab block
+
+    Accepts:
+    - block-open: {Boolean}
+    - block-count: {Boolean}
+    - product-id: {String}
+    - product-meta-reviews: {String}
+    - product-meta-rating-count: {String}
+{% endcomment %}
+
+<details
+    {% if block-open %}open{% endif %}
+    id="reviews"
+>
+    <summary>
+        <h3 class="f-family--body u-large u-text-transform--none u-color-text">
+            {{ 'products.layout.reviews' | t }} {% if block-count %}<span>({% if product-meta-rating-count %}{{ product-meta-rating-count }}{% else %}0{% endif %})</span>{% endif %}
+        </h3>
+        <summary-icon>
+            <i class="icon icon--plus-t" aria-hidden="true"></i>
+        </summary-icon>
+    </summary>
+
+    <details-content>
+        <div class="product-single__accordion__item-wrap rte">
+            <div class="product-single__reviews">
+                <div id="shopify-product-reviews" data-id="{{ product-id }}">{{ product-meta-reviews }}</div>
+            </div>
+        </div>
+    </details-content>
+</details>

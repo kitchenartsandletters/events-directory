@@ -1,0 +1,195 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "name": "Header group",
+  "type": "header",
+  "sections": {
+    "announcement-bar": {
+      "type": "header-announcement-bar",
+      "blocks": {
+        "3e116665-70c4-4776-bd66-87d089935174": {
+          "type": "announcement",
+          "disabled": true,
+          "settings": {
+            "icon": "icon-champagne-cheers",
+            "svg-code": "",
+            "text": "Closing at 4 pm on December 31.  Closed January 1.",
+            "text_link": "",
+            "link": ""
+          }
+        },
+        "f752cf03-1fbc-4be1-a3cc-171a071687d2": {
+          "type": "announcement",
+          "settings": {
+            "icon": "icon-delivery-truck-3",
+            "svg-code": "",
+            "text": "We ship worldwide—Please read about our Shipping Policies",
+            "text_link": "here",
+            "link": "shopify://policies/shipping-policy"
+          }
+        }
+      },
+      "block_order": [
+        "3e116665-70c4-4776-bd66-87d089935174",
+        "f752cf03-1fbc-4be1-a3cc-171a071687d2"
+      ],
+      "settings": {
+        "home_page_only": false,
+        "text_size_desktop": 1,
+        "text_size_mobile": 1,
+        "text_style": "heading",
+        "message_color_bg": "#212121",
+        "message_color_text": "#ffffff",
+        "close_icon": false,
+        "auto_carousel": true,
+        "carousel_speed": 8
+      }
+    },
+    "header": {
+      "type": "header",
+      "blocks": {
+        "83474223-52ae-4eaa-ae2f-b12ee5293479": {
+          "type": "collection-menu",
+          "disabled": true,
+          "settings": {
+            "triggers": "shop with us",
+            "layout_width": "wide",
+            "layout_alignment": "left",
+            "layout_content_priority": "navigation",
+            "enable_navigations": true,
+            "linklist_width": 100,
+            "links_per_row": 6,
+            "links_columns_spacing": 12,
+            "linklist_alignment": "left",
+            "enable_additional_content": false,
+            "additional_content_width": 100,
+            "additional_content_per_row": 5,
+            "additional_content_spacing": 30,
+            "additional_content_alignment": "center",
+            "image_ratio": "1:1",
+            "collections": [],
+            "sidebar_additional_content_per_row": "1",
+            "sidebar_additional_content_enable_carousel": true
+          }
+        },
+        "82c01eab-09d6-4984-b53e-16104ec83baf": {
+          "type": "collection-menu",
+          "settings": {
+            "triggers": "out-of-print books",
+            "layout_width": "default",
+            "layout_alignment": "center",
+            "layout_content_priority": "additional_content",
+            "enable_navigations": true,
+            "linklist_width": 60,
+            "links_per_row": 3,
+            "links_columns_spacing": 30,
+            "linklist_alignment": "left",
+            "enable_additional_content": false,
+            "additional_content_width": 100,
+            "additional_content_per_row": 5,
+            "additional_content_spacing": 30,
+            "additional_content_alignment": "center",
+            "image_ratio": "1:1",
+            "collections": [],
+            "sidebar_additional_content_per_row": "1",
+            "sidebar_additional_content_enable_carousel": true
+          }
+        },
+        "image_menu_zBm9kR": {
+          "type": "image-menu",
+          "settings": {
+            "triggers": "shop with us",
+            "layout_width": "default",
+            "layout_alignment": "left",
+            "layout_content_priority": "navigation",
+            "enable_navigations": true,
+            "linklist_width": 60,
+            "links_per_row": 4,
+            "links_columns_spacing": 30,
+            "linklist_alignment": "left",
+            "enable_additional_content": true,
+            "additional_content_title": "",
+            "additional_content_width": 40,
+            "additional_content_per_row": 2,
+            "additional_content_spacing": 30,
+            "additional_content_alignment": "center",
+            "image_ratio": "1:1",
+            "sidebar_additional_content_per_row": "1",
+            "sidebar_additional_content_enable_carousel": true,
+            "image_1": "shopify://shop_images/KALGCSp24.png",
+            "image_1_title": "Gift Cards",
+            "image_1_text": "",
+            "image_1_link": "shopify://products/kitchen-arts-letters-gift-card",
+            "image_2": "shopify://shop_images/KALpreorder.png",
+            "image_2_title": "Preorder",
+            "image_2_text": "",
+            "image_2_link": "shopify://collections/pre-order",
+            "image_3_title": "",
+            "image_3_text": "",
+            "image_3_link": "",
+            "image_4_title": "",
+            "image_4_text": "",
+            "image_4_link": "",
+            "image_5_title": "",
+            "image_5_text": "",
+            "image_5_link": "",
+            "image_6_title": "",
+            "image_6_text": "",
+            "image_6_link": ""
+          }
+        }
+      },
+      "block_order": [
+        "83474223-52ae-4eaa-ae2f-b12ee5293479",
+        "82c01eab-09d6-4984-b53e-16104ec83baf",
+        "image_menu_zBm9kR"
+      ],
+      "custom_css": [
+        ".secondary-nav__item--light .secondary-nav__link {font-size: 15px;}"
+      ],
+      "settings": {
+        "menu": "mega-menu",
+        "layout": "left",
+        "style": "sticky",
+        "link_style": "word",
+        "enable_chevrons": true,
+        "header_divider": true,
+        "header_bg": "#ffffff",
+        "header_text": "#000000",
+        "logo": "shopify://shop_images/KitArt_LetLogo.png",
+        "header_transparent": false,
+        "header_transparent_collection": false,
+        "header_transparent_divider": true,
+        "header_transparent_text": "#000000",
+        "special_link_triggers": "",
+        "special_link_color": "#c00000",
+        "logo_size": 50,
+        "logo_spacing": 1,
+        "logo_size_mobile": 60,
+        "logo_spacing_mobile": 0,
+        "sidebar_main_menu": "",
+        "sidebar_secondary_menu": "",
+        "sidebar_show_borders": true,
+        "sidebar_show_collection_images_in_submenu": true,
+        "sidebar_show_view_all_in_submenu": true,
+        "sidebar_view_all_style": "outline",
+        "sidebar_show_contact_number": true,
+        "sidebar_show_contact_email": true,
+        "sidebar_show_social": true,
+        "enable_country_selector": false,
+        "enable_language_selector": false
+      }
+    }
+  },
+  "order": [
+    "announcement-bar",
+    "header"
+  ]
+}

@@ -1,0 +1,161 @@
+{%- liquid
+
+    assign current_variant = product.selected_or_first_available_variant
+     assign in_preorder_collection = false
+      for collection in product.collections
+        if in_preorder_collection == false and collection.title == 'Preorder'
+          assign in_preorder_collection = true
+        endif
+      endfor
+     assign in_pastop_collection = false
+       for collection in product.collections
+      	if in_pastop_collection == false and collection.title == 'Past Out-of-Print Offers'
+     assign in_pastop_collection = true
+        endif
+       endfor
+   
+    if settings.product_grid_label_sold_out and product.available == false
+        assign sold_out_label = true
+    endif
+
+    if settings.product_grid_label_discount and product.compare_at_price > product.price or product.compare_at_price_varies
+        assign discount_label = true
+    endif
+
+    assign product_created_at = product.created_at | date: '%s'
+    assign time_ago = 'now' | date: '%s' | minus: product_created_at | divided_by: 86400
+    if time_ago < settings.product_grid_label_new_days and settings.product_grid_label_new
+        assign new_label = true
+    endif
+
+    if settings.product_grid_label_custom_1
+        for collection in product.collections
+            if collection.title == collections[settings.product_grid_label_collection_1].title
+                assign custom_label_1 = true
+                break
+            endif
+        endfor
+    endif
+
+    if settings.product_grid_label_custom_2
+        for collection in product.collections
+            if collection.title == collections[settings.product_grid_label_collection_2].title
+                assign custom_label_2 = true
+                break
+            endif
+        endfor
+    endif
+
+    if settings.product_grid_label_custom_3
+         for tag in product.tags
+             if tag == settings.product_grid_label_tag
+               assign custom_label_3 = true
+               break
+             endif
+         endfor
+    endif
+
+   
+   if settings.product_grid_label_custom_4
+         for tag in product.tags
+             if tag == settings.product_grid_label_tag2
+               assign custom_label_4 = true
+               break
+             endif
+         endfor
+    endif
+
+   if settings.product_grid_label_custom_5
+    if current_variant.inventory_quantity < 1 and collection.title != 'Past Out-of-Print Offers' and collection.title != 'Preorder' and product.available == true and product.type != 'Hats' and  in_preorder_collection == false and product.type != 'GCP' and product.type != 'T-Shirt'
+     assign custom_label_5 = true
+    endif
+   endif
+  
+-%}
+{%- if sold_out_label or discount_label or new_label or custom_label_1 or custom_label_2 or custom_label_3 or custom_label_4 or custom_label_5 -%}
+    <!-- snippet/product-grid-label.liquid -->
+    <ul class="product-card__label__items o-list-bare{% if settings.product_grid_label_position_left %} product-card__label__items--position_left{% endif %}">
+        {%- unless collection.title == 'Past Out-of-Print Offers' or product.tags contains 'pastop' %}
+        {%- if sold_out_label -%}
+            <li class="product-card__label product-card__label--sold label label--sold_out">
+                <p class="product-card__label-text label__text">{{ 'products.product_labels.sold_out_label' | t }}</p>
+            </li>
+        {%- endif -%}
+        {%- endunless -%}
+          
+        {%- if discount_label -%}
+            {%- liquid
+                assign discount_format_percentage = product.compare_at_price | minus: product.price | times: 100.0 | divided_by: product.compare_at_price | round
+                assign discount_format_currency = product.compare_at_price | minus: product.price | round | money
+
+                if product.compare_at_price > product.price
+                    assign difference = product.compare_at_price | minus: product.price
+                    assign compare_at_price = product.compare_at_price
+                endif
+
+                if product.compare_at_price_varies
+                    assign difference = 0
+                    for variant in product.variants
+                        if variant.compare_at_price > variant.price
+                            assign variant_price_difference = variant.compare_at_price | minus: variant.price
+                            if variant_price_difference > difference
+                                assign difference = variant_price_difference
+                                assign compare_at_price = variant.compare_at_price
+                            endif
+                        endif
+                    endfor
+                endif
+
+                assign discount_format_percentage = difference | times: 100.0 | divided_by: compare_at_price | round
+                assign discount_format_currency = difference | round | money
+            -%}
+            <li class="product-card__label product-card__label--sale label label--discount{% if settings.product_grid_label_hide_all and product.available == false %} product-card__label__items_hide{% endif %}">
+
+                {%- case settings.product_grid_label_discount_type -%}
+                    {%- when 'currency' -%}
+                        <p class="product-card__label-text label__text">{{ 'products.product_labels.discount_currency' | t: discount_format_currency: discount_format_currency }}</p>
+                    {%- when 'percentage' -%}
+                        <p class="product-card__label-text label__text">{{ 'products.product_labels.discount_percentage' | t: discount_format_percentage: discount_format_percentage }}</p>
+                    {%- when 'text' -%}
+                        <p class="product-card__label-text label__text">{{ 'products.product_labels.discount_text' | t }}</p>
+                {%- endcase -%}
+
+            </li>
+        {%- endif -%}
+
+        {% if new_label %}
+            <li class="product-card__label product-card__label--new label label--new{% if settings.product_grid_label_hide_all and product.available == false %} product-card__label__items_hide{% endif %}">
+                <p class="product-card__label-text label__text">{{ settings.product_grid_label_title_new }}</p>
+            </li>
+        {% endif %}
+
+      
+        {% if custom_label_1 %}
+            <li class="product-card__label product-card__label--custom__1 label label--custom_1{% if settings.product_grid_label_hide_all and product.available == false %} product-card__label__items_hide{% endif %}">
+                <p class="product-card__label-text label__text">{{ settings.product_grid_label_title_custom_1 }}</p>
+            </li>
+        {% endif %}
+
+        {% if custom_label_2 %}
+            <li class="product-card__label product-card__label--custom__2 label label--custom_2{% if settings.product_grid_label_hide_all and product.available == false %} product-card__label__items_hide{% endif %}">
+                <p class="product-card__label-text label__text">{{ settings.product_grid_label_title_custom_2 }}</p>
+            </li>
+        {% endif %}
+
+        {% if custom_label_3 %}
+            <li class="product-card__label product-card__label--custom__3 label label--custom_3{% if settings.product_grid_label_hide_all and product.available == false %} product-card__label__items_hide{% endif %}">
+                <p class="product-card__label-text label__text">{{ settings.product_grid_label_title_custom_3 }}</p>
+            </li>
+        {% endif %}
+        {% if custom_label_4 %}
+            <li class="product-card__label product-card__label--custom__4 label label--custom_4{% if settings.product_grid_label_hide_all and product.available == false %} product-card__label__items_hide{% endif %}">
+                <p class="product-card__label-text label__text">{{ settings.product_grid_label_title_custom_4 }}</p>
+            </li>
+        {% endif %}
+        {% if custom_label_5 %}
+            <li class="product-card__label product-card__label--custom__5 label label--custom_5{% if settings.product_grid_label_hide_all and product.available == false %} product-card__label__items_hide{% endif %}">
+                <p class="product-card__label-text label__text">{{ settings.product_grid_label_title_custom_5 }}</p>
+            </li>
+        {% endif %}
+    </ul>
+{%- endif -%}

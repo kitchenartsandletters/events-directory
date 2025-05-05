@@ -1,0 +1,162 @@
+<section class="section section--rich-text section--{{ section.id }}{% if section.settings.section-bottom-margin %} section--mb-0{% endif %}" data-section-id="{{ section.id }}" data-section-type="rich-text">
+    <div class="home-rich-text">
+        <div class="container{% if section.settings.full_width %} container--medium{% else %} container--tiny{% endif %}">
+            {% if section.settings.section_title != blank %}
+                <div class="section__title section__title--mb-s section__title--center home-rich-text__title">
+                    <h2 class="section__title-text">{{ section.settings.section_title | escape }}</h2>
+                </div>
+            {% endif %}
+            <div class="home-rich-text__content u-text-center rte">
+                {% if section.settings.text != blank %}
+                    <div class="section-text" style="text-align: left;"> <!-- Left alignment for section text -->
+                        {{ section.settings.text }}
+                    </div>
+                {% endif %}
+                <div class="columns-container" style="display: flex; flex-direction: column;">
+                    {% assign numColumns = section.blocks.size %}
+                    {% if numColumns <= 5 %}
+                        {% for column in section.blocks %}
+                            <div class="column" style="width: 100%; background-color: {{ column.settings.column_background_color }};"> <!-- Make columns full width on mobile screens -->
+                                <h3>{{ column.settings.column_header | escape }}</h3>
+                                <div class="column-text" style="text-align: {{ column.settings.column_text_alignment }};"> <!-- Justify the column text paragraph -->
+                                    {{ column.settings.column_text | safe }}
+                                </div>
+                                {% if column.settings.column_image %}
+                                    <img src="{{ column.settings.column_image | img_url: 'medium' }}" alt="Column Image">
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>You've reached the maximum limit of 5 columns.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .columns-container {
+        flex-wrap: wrap;
+    }
+
+    .column {
+        margin-bottom: 20px;
+    }
+</style>
+
+{% schema %}
+{
+    "name": "Rich text with Columns",
+    "class": "js-section__rich-text",
+    "settings": [
+        {
+            "type": "checkbox",
+            "id": "full_width",
+            "label": "Wide container"
+        },
+        {
+            "type": "text",
+            "id": "section_title",
+            "label": "Heading",
+            "default": "Talk about your brand"
+        },
+        {
+            "type": "richtext",
+            "id": "text",
+            "label": "Text",
+            "default": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>"
+        },
+        {
+            "type": "checkbox",
+            "id": "section-bottom-margin",
+            "label": "Reduce bottom margin",
+            "default": false
+        },
+        {
+            "type": "select",
+            "id": "column_justification",
+            "label": "Column Justification",
+            "options": [
+                {
+                    "value": "left",
+                    "label": "Left"
+                },
+                {
+                    "value": "center",
+                    "label": "Center"
+                },
+                {
+                    "value": "right",
+                    "label": "Right"
+                }
+            ],
+            "default": "left"
+        }
+    ],
+    "blocks": [
+        {
+            "type": "repeatable",
+            "name": "Column",
+            "settings": [
+                {
+                    "type": "text",
+                    "id": "column_header",
+                    "label": "Column Header",
+                    "default": "Column Header"
+                },
+                {
+                    "type": "richtext",
+                    "id": "column_text",
+                    "label": "Column Text",
+                    "default": "<p>Column Text</p>"
+                },
+                {
+                    "type": "image_picker",
+                    "id": "column_image",
+                    "label": "Column Image"
+                },
+                {
+                    "type": "select",
+                    "id": "column_text_alignment",
+                    "label": "Column Text Alignment",
+                    "options": [
+                        {
+                            "value": "left",
+                            "label": "Left"
+                        },
+                        {
+                            "value": "center",
+                            "label": "Center"
+                        },
+                        {
+                            "value": "right",
+                            "label": "Right"
+                        },
+                        {
+                            "value": "justify",
+                            "label": "Justify"
+                        }
+                    ],
+                    "default": "left"
+                },
+                {
+                    "type": "color",
+                    "id": "column_background_color",
+                    "label": "Column Background Color",
+                    "default": "#ffffff"
+                }
+            ]
+        }
+    ],
+    "presets": [
+        {
+            "name": "Rich text with Columns"
+        }
+    ],
+    "enabled_on": {
+        "templates": ["*"],
+        "groups": ["header", "footer"]
+    }
+}
+{% endschema %}

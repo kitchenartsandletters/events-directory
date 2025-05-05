@@ -1,0 +1,62 @@
+{% comment %}
+  Render card element skeleton
+
+  Accepts:
+    - image_ratio: {String} Image ratio string. Values are "1:1", "3:4", "4:3", "16:9", "2:3", "natural"
+    - show_button: {Boolean} Show quick shop button (optional)
+{% endcomment %}
+
+{%- liquid
+  if image_ratio == 'natural'
+    assign image_ratio = '1:1'
+  endif
+-%}
+
+<div class="product-card {% if settings.product_grid_align %}product-card--center{% endif %}">
+
+  <div class="
+          o-ratio
+          o-ratio--{{ image_ratio }}
+      "
+  >
+
+      <div class="o-ratio__content">
+          <div class="product-card__link product-card__link--full-opacity {% if page == 'home' %} home-products__link{% endif %}">
+              <div class="product-card__media">
+                <div class="skeleton-image skeleton-image--{{ image_ratio }}"></div>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  {%- if show_button -%}
+    <div class="product-card-btn">
+      <div class="skeleton-button">
+        <span class="skeleton-text skeleton-text--inverse skeleton-text--small skeleton-text--inline skeleton-text--1/2"></span>
+      </div>
+    </div>
+  {%- endif -%}
+
+  <div class="product-card__details">
+    <div class="product-card__link">
+        {% if settings.product_grid_vendor %}
+            <p class="product-card__vendor u-medium-small h3">
+              <span class="skeleton-text skeleton-text--small skeleton-text--1/2"></span>
+            </p>
+        {% endif %}
+        <div class="product-card__title">
+          <div class="skeleton-text"></div>
+        </div>
+    </div>
+
+    <div class="product-card__details__hover u-medium">
+        <div class="product-card__link">
+            {% if settings.product_grid_price %}
+                <p class="price">
+                  <span class="skeleton-text skeleton-text--1/3"></span>
+                </p>
+            {% endif %}
+          </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,398 @@
+/*! PhotoSwipe main CSS by Dmytro Semenov | photoswipe.com */
+/*
+  This file has not been built, edit here
+ */
+.pswp {
+  --pswp-bg: #ffffff;
+  --pswp-placeholder-bg: #f2f2f2;
+  --pswp-error-text-color: #f7f7f7;
+  --pswp-root-z-index: 100000;
+  --pswp-preloader-color: rgba(79, 79, 79, 0.4);
+  --pswp-preloader-color-secondary: rgba(255, 255, 255, 0.9);
+  /* defined via js:
+  --pswp-transition-duration: 333ms; */
+  --pswp-icon-color: #222;
+  --pswp-icon-color-secondary: #4f4f4f;
+  --pswp-icon-stroke-color: rgba(0 0 0 / 25%);
+  --pswp-icon-stroke-width: 2px; }
+
+/*
+	Styles for basic PhotoSwipe (pswp) functionality (sliding area, open/close transitions)
+*/
+.pswp {
+  position: fixed;
+  z-index: var(--pswp-root-z-index);
+  display: none;
+  touch-action: none;
+  outline: 0;
+  opacity: 0.003;
+  contain: layout style size;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0); }
+
+/* Prevents focus outline on the root element,
+  (it may be focused initially) */
+.pswp:focus {
+  outline: 0; }
+
+.pswp * {
+  box-sizing: border-box; }
+
+.pswp img {
+  max-width: none; }
+
+.pswp--open {
+  display: block; }
+
+.pswp,
+.pswp__bg {
+  transform: translateZ(0);
+  will-change: opacity; }
+
+.pswp__bg {
+  opacity: 0.005;
+  background: var(--pswp-bg); }
+
+.pswp,
+.pswp__scroll-wrap {
+  overflow: hidden; }
+
+.pswp,
+.pswp__scroll-wrap,
+.pswp__bg,
+.pswp__container,
+.pswp__item,
+.pswp__img,
+.pswp__zoom-wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%; }
+
+.pswp__bg {
+  display: block !important; }
+
+.pswp {
+  position: fixed; }
+
+.pswp__img,
+.pswp__zoom-wrap {
+  width: auto;
+  height: auto; }
+
+.pswp--click-to-zoom.pswp--zoom-allowed .pswp__img {
+  cursor: zoom-in;}
+
+.pswp--click-to-zoom.pswp--zoomed-in .pswp__img {
+  cursor: zoom-out;}
+
+/*.pswp--click-to-zoom.pswp--zoomed-in .pswp__img:active {
+  cursor: -webkit-grabbing;
+  cursor: -moz-grabbing;
+  cursor: grabbing; }
+*/
+/* :active to override grabbing cursor */
+.pswp--no-mouse-drag.pswp--zoomed-in .pswp__img,
+.pswp--no-mouse-drag.pswp--zoomed-in .pswp__img:active,
+.pswp__img {
+  cursor: zoom-out;}
+
+/* Prevent selection and tap highlights */
+.pswp__container,
+.pswp__img,
+.pswp__button {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none; }
+
+.pswp__item {
+  /* z-index for fade transition */
+  z-index: 1;
+  overflow: hidden; }
+
+.pswp__hidden {
+  display: none !important; }
+
+/*
+
+  PhotoSwipe UI
+
+*/
+/*
+	Error message appears when image is not loaded
+	(JS option errorMsg controls markup)
+*/
+.pswp__error-msg {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  padding: 0 10px;
+  margin-top: -0.5em;
+  font-size: 1em;
+  line-height: 1;
+  color: var(--pswp-error-text-color);
+  text-align: center; }
+
+.pswp__error-msg a {
+  color: var(--pswp-error-text-color);
+  text-decoration: underline; }
+
+/*
+class pswp__hide-on-close is applied to elements that
+should hide (for example fade out) when PhotoSwipe is closed
+and show (for example fade in) when PhotoSwipe is opened
+ */
+.pswp .pswp__hide-on-close {
+  opacity: 0.005;
+  will-change: opacity;
+  transition: opacity var(--pswp-transition-duration) cubic-bezier(0.4, 0, 0.22, 1);
+  z-index: 10;
+  /* always overlap slide content */
+  pointer-events: none;
+  /* hidden elements should not be clickable */ }
+
+/* class pswp--ui-visible is added when opening or closing transition starts */
+.pswp--ui-visible .pswp__hide-on-close {
+  opacity: 1;
+  pointer-events: auto; }
+
+/* <button> styles, including css reset */
+.pswp__button {
+  position: relative;
+  display: block;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  margin: 20px;
+  overflow: hidden;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  -webkit-appearance: none;
+  -webkit-touch-callout: none; }
+
+.pswp__button::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(100% - 6px);
+  height: calc(100% - 6px);
+  -webkit-box-shadow: 0 0 4px var(--pswp-icon-stroke-color);
+  box-shadow: 0 0 4px var(--pswp-icon-stroke-color);
+  background-color: #ffffff;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: auto;
+  margin-bottom: auto;
+  text-align: center;
+  transform: translate(-50%, -50%);
+  transition: background-color .2s ease-in-out;
+}
+
+.pswp__button .pswp__icn,
+.pswp__button--arrow .pswp__icn::before {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: none;
+  border-radius: 0; }
+
+.pswp__button:hover::before,
+.pswp__button:active::before,
+.pswp__button:focus::before {
+  background-color: rgba(255, 255, 255, 1);
+  transition: background-color .2s ease-in-out;
+  opacity: 1; }
+
+.pswp__button:disabled {
+  opacity: 0.3;
+  cursor: auto; }
+
+.pswp__icn {
+  fill: var(--pswp-icon-color);
+  color: var(--pswp-icon-color); }
+
+.pswp__icn {
+  position: absolute;
+  top: 14px;
+  left: 9px;
+  width: 15px;
+  height: 15px; 
+  font-size: 15px;
+  overflow: hidden;
+  pointer-events: none; }
+
+.pswp__icn-shadow {
+  stroke: var(--pswp-icon-stroke-color);
+  stroke-width: var(--pswp-icon-stroke-width);
+  fill: none; }
+
+.pswp__icn:focus {
+  outline: 0; }
+
+/*
+	div element that matches size of large image,
+	large image loads on top of it,
+	used when msrc is not provided
+*/
+div.pswp__img--placeholder,
+.pswp__img--with-bg {
+  background: var(--pswp-placeholder-bg); }
+
+.pswp__top-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  /* height: 60px; */
+  height: clamp(4rem, 14vw, 6rem);
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  z-index: 10;
+  /* allow events to pass through top bar itself */
+  pointer-events: none !important; }
+
+.pswp__top-bar > * {
+  pointer-events: auto;
+  /* this makes transition significantly more smooth,
+     even though inner elements are not animated */
+  will-change: opacity; }
+
+/*
+
+  Close button
+
+*/
+ .pswp__button--close {
+  margin-left: 6px; } 
+
+/*
+
+  Arrow buttons
+
+*/
+.pswp__button--arrow {
+  position: absolute;
+  top: 0;
+  top: 50%;
+  transform: translateY(-50%); }
+
+.pswp__button--arrow:disabled {
+  display: none;
+  cursor: default; }
+
+
+.pswp--one-slide .pswp__button--arrow {
+  display: none; }
+
+/* hide arrows on touch screens */
+.pswp--touch .pswp__button--arrow {
+  visibility: hidden; }
+
+/* show arrows only after mouse was used */
+.pswp--has_mouse .pswp__button--arrow {
+  visibility: visible; }
+
+.pswp__button--arrow--prev {
+  right: auto;
+  left: 0px; }
+
+.pswp__button--arrow--prev .pswp__icn {
+  left: 48%;
+}
+
+.pswp__button--arrow--next {
+  right: 0px; }
+
+.pswp__button--arrow--next .pswp__icn {
+  left: 52%;
+}
+/*
+
+  Zoom button
+
+*/
+.pswp__button--zoom {
+  display: none;
+  margin-right: 0; }
+
+.pswp--zoom-allowed .pswp__button--zoom {
+  display: block; }
+
+/* "+" => "-" */
+.pswp--zoomed-in .pswp__zoom-icn-bar-v {
+  display: none; }
+
+.pswp__button--zoom .pswp__icn {
+  width: 16px;
+  height: 16px;
+}
+
+.no-touchevents .pswp__button--zoom {
+  display: none;
+}
+
+/*
+
+  Loading indicator
+
+*/
+.pswp__preloader {
+  position: relative;
+  overflow: hidden;
+  width: 50px;
+  height: 60px;
+  margin-right: auto; }
+
+.pswp__preloader .pswp__icn {
+  opacity: 0;
+  transition: opacity 0.2s linear;
+  animation: pswp-clockwise 600ms linear infinite; }
+
+.pswp__preloader--active .pswp__icn {
+  opacity: 0.85; }
+
+@keyframes pswp-clockwise {
+  0% {
+    transform: rotate(0deg); }
+  100% {
+    transform: rotate(360deg); } }
+
+/*
+
+  "1 of 10" counter
+
+*/
+.pswp__counter {
+  height: 30px;
+  margin: 15px 0 0 20px;
+  font-size: 14px;
+  line-height: 30px;
+  color: var(--pswp-icon-color);
+  text-shadow: 1px 1px 3px var(--pswp-icon-color-secondary);
+  opacity: 0.85; }
+
+.pswp--one-slide .pswp__counter {
+  display: none; }
+
+
+
+@media screen and (max-width: 980px) {
+  .pswp__button {
+    margin: 10px;
+    width: 42px;
+    height: 42px;
+  }
+  .pswp__button--zoom {
+    margin-right: 0;
+  }
+  .pswp__button--close {
+    margin-left: 6px;
+  }
+}

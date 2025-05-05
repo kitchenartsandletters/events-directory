@@ -1,0 +1,44 @@
+{% comment %}
+    Renders product page image block
+
+    Accepts:
+    - image: {Object}
+    - image-width: {String}
+    - image-sizes: {String}
+    - link: {Object}
+    - align: {String}
+{% endcomment %}
+
+{% if image != blank %}
+    <div class="product-form__img" style="text-align: {{ align }}">
+        {% unless link == blank %}
+            <a href="{{ link }}" class="product-form__img__link">
+        {% endunless %}
+            <img
+                class="product-form__img__img"
+                src="{{ image | image_url: width: 360 }}"
+                srcset="
+                    {{ image | image_url: width: 180 }} 180w {{ 180 | divided_by: image.aspect_ratio | round }}h,
+                    {{ image | image_url: width: 360 }} 360w {{ 360 | divided_by: image.aspect_ratio | round }}h,
+                    {{ image | image_url: width: 540 }} 540w {{ 540 | divided_by: image.aspect_ratio | round }}h,
+                    {{ image | image_url: width: 720 }} 720w {{ 720 | divided_by: image.aspect_ratio | round }}h,
+                    {{ image | image_url: width: 900 }} 900w {{ 900 | divided_by: image.aspect_ratio | round }}h,
+                    {{ image | image_url: width: 1080 }} 1080w {{ 1080 | divided_by: image.aspect_ratio | round }}h,
+                    {{ image | image_url: width: 1296 }} 1296w {{ 1296 | divided_by: image.aspect_ratio | round }}h,
+                    {{ image | image_url: width: 1512 }} 1512w {{ 1512 | divided_by: image.aspect_ratio | round }}h,
+                    {{ image | image_url: width: 1728 }} 1728w {{ 1728 | divided_by: image.aspect_ratio | round }}h,
+                    {{ image | image_url: width: 2100 }} 2100w {{ 2100 | divided_by: image.aspect_ratio | round }}h,
+                    {{ image | image_url: width: 2260 }} 2260w {{ 2260 | divided_by: image.aspect_ratio | round }}h
+                "
+                width="360"
+                height="{{ 360 | divided_by: image.aspect_ratio | round }}"
+                alt="{{ image.alt }}"
+                loading="lazy"
+                style="max-width: {{ image-width }}px"
+                sizes="{% if image-width < 380 %}{{ image-width }}px{% else %}{{ image-sizes }}{% endif %}"
+            />
+        {% unless link == blank %}
+            </a>
+        {% endunless %}
+    </div>
+{% endif %}

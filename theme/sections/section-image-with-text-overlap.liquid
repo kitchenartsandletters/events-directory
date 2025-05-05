@@ -1,0 +1,532 @@
+{%- liquid
+    assign sizes = '100vw'
+
+    case section.settings.block_layout
+        when '2/3'
+            assign sizes = '(min-width: 981px) 66vw, 100vw'
+            assign image_width = 'u-2/3@desk'
+            assign text_width = 'u-1/3@desk'
+        when '3/4'
+            assign sizes = '(min-width: 981px) 75vw, 100vw'
+            assign image_width = 'u-3/4@desk'
+            assign text_width = 'u-1/4@desk'
+    endcase
+-%}
+
+<style>
+    {% if section.settings.block_spacing != 0 %}
+        .section--{{ section.id }} .image-with-text__item {
+            padding: {{ section.settings.block_spacing | plus: 1 | times: 9 }}px 0;
+        }
+        .section--{{ section.id }} .image-with-text__item:not(:first-child) {
+            margin-top: -{{ section.settings.block_spacing | plus: 1 | times: 18 }}px;
+        }
+        .section--{{ section.id }} .image-with-text__item:not(:last-child) {
+            padding-bottom: {{ section.settings.block_spacing | plus: 1 | times: 18 }}px;
+        }
+    {% endif %}
+</style>
+
+{% if section.blocks.size > 0 %}
+<section class="section section--{{ section.id }} section--full-bg section--full{% if section.settings.section-bottom-margin %} section--mb-0{% endif %}" data-section-id="{{ section.id }}" data-section-type="image-with-text-overlap">
+    <div class="image-with-text image-with-text--overlap{% if section.settings.container == 'full-width' %} image-with-text--full{% endif %}">
+
+        {% for block in section.blocks %}
+
+            <div class="image-with-text__item block--{{ block.id }}" {{ block.shopify_attributes }}>
+                <div class="image-with-text__item-bg" style="background-color: {{ block.settings.bg_color_block }}"></div>
+                <style>
+                    .block--{{ block.id }} .section__title-text,
+                    .block--{{ block.id }} .image-with-text__text,
+                    .block--{{ block.id }} .link--arrow,
+                    .block--{{ block.id }} .link--underline,
+                    .block--{{ block.id }} .rte a {
+                        color: {{ block.settings.color_text }};
+                    } 
+                    .block--{{ block.id }} a.c-btn--hollow {
+                      background-color: transparent;
+                      color: {{ block.settings.color_text }};
+                      box-shadow: inset 0px 0px 0px 1px {{ block.settings.color_text }};
+                    }
+                    {% unless block.settings.text_border_color %}
+                    .block--{{ block.id }} .section__title.section__title .section__title-text:after {
+                        background: {{ block.settings.color_text }};
+                    }
+                    {% endunless %}
+                    @media (hover: hover) {
+                      .block--{{ block.id }} a.c-btn--hollow:hover {
+                        background-color: {{ block.settings.color_text }};
+
+                        {%- liquid
+                            assign text_color_brightness = block.settings.color_text | color_brightness
+                            assign brightness_breakPoint = 125
+
+                            if text_color_brightness < brightness_breakPoint
+                                assign button_hover_text = '#FFFFFF'
+                            else
+                                assign button_hover_text = '#000000'
+                            endif
+                        -%}
+                        color: {{ button_hover_text }};
+                      }
+                    }
+                </style>
+
+                <div class="container{% unless section.settings.container == 'full' %} container--{{ section.settings.container }}{% endunless %}{% if section.settings.container == 'full-width' %} container--p-0 container--tab-0{% endif %}">
+
+                    <div class="image-with-text__content image-with-text__content--{{ section.settings.block_align }}">
+                        <div class="o-layout u-flex u-flex--middle">
+                            <div class="o-layout__item u-1/1 {{ image_width }}">
+                                <div class="image-with-text__media">
+                                    {%- assign img_url = block.settings.image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+                                    <div class="o-ratio o-ratio--{{ section.settings.image_ratio }}"{% if block.settings.image == null and section.settings.image_ratio == 'natural' %} style="padding-bottom:100%;"{% elsif block.settings.image != null and section.settings.image_ratio == 'natural' %} style="padding-bottom:{{ 1 | divided_by: block.settings.image.aspect_ratio | times: 100 }}%;"{% endif %}>
+                                        <div class="o-ratio__content">
+                                            {% unless block.settings.image == blank %}
+                                                <img
+                                                    class="image-with-text__media-img image-with-text__media-img--crop"
+                                                    src="{{ block.settings.image | image_url: width: 300 }}"
+                                                    srcset="
+                                                        {{ block.settings.image | image_url: width: 180 }} 180w {{ 180 | divided_by: block.settings.image.aspect_ratio | round }}h,
+                                                        {{ block.settings.image | image_url: width: 360 }} 360w {{ 360 | divided_by: block.settings.image.aspect_ratio | round }}h,
+                                                        {{ block.settings.image | image_url: width: 540 }} 540w {{ 540 | divided_by: block.settings.image.aspect_ratio | round }}h,
+                                                        {{ block.settings.image | image_url: width: 720 }} 720w {{ 720 | divided_by: block.settings.image.aspect_ratio | round }}h,
+                                                        {{ block.settings.image | image_url: width: 900 }} 900w {{ 900 | divided_by: block.settings.image.aspect_ratio | round }}h,
+                                                        {{ block.settings.image | image_url: width: 1080 }} 1080w {{ 1080 | divided_by: block.settings.image.aspect_ratio | round }}h,
+                                                        {{ block.settings.image | image_url: width: 1296 }} 1296w {{ 1296 | divided_by: block.settings.image.aspect_ratio | round }}h,
+                                                        {{ block.settings.image | image_url: width: 1512 }} 1512w {{ 1512 | divided_by: block.settings.image.aspect_ratio | round }}h
+                                                    "
+                                                    sizes="{{ sizes }}"
+                                                    width="300"
+                                                    height="{{ 300 | divided_by: block.settings.image.aspect_ratio | round }}"
+                                                    alt="{{ block.settings.image.alt | escape }}"
+                                                    loading="lazy"
+                                                    style="object-position:{{ block.settings.image.presentation.focal_point }}"
+                                                />
+                                            {% else %}
+                                                {% capture current %}{% cycle 1, 2 %}{% endcapture %}
+                                                {{ 'lifestyle-' | append: current | placeholder_svg_tag: 'image-with-text__media-img placeholder-svg' }}
+                                            {% endunless %}
+                                        </div>
+                                    </div>
+                                    {% unless block.settings.video == blank %}
+                                        {% capture video_url %}{% if block.settings.video.type == 'youtube' %}//www.youtube.com/watch?v={{ block.settings.video.id }}{% elsif block.settings.video.type == 'vimeo' %}//vimeo.com/{{ block.settings.video.id }}{% endif %}{% endcapture %}
+                                        <div class="image-with-text__media-video">
+                                            <a href="{{ video_url }}" class="image-with-text__media-video__btn c-btn c-btn--primary c-btn--play icon-fallback js-pop-video">
+                                                <i class="icon icon--play" aria-hidden="true"></i>
+                                                <span class="icon-fallback__text">{{ 'sections.video.play_label' | t }}</span>
+                                            </a>
+                                        </div>
+                                    {% endunless %}
+                                </div>
+                            </div>
+                            <div class="o-layout__item u-1/1 {{ text_width }}">
+                                <div class="image-with-text__box image-with-text__box--{{ block.settings.horizontal_align }}{% if block.settings.link != blank %} image-with-text__box--btn{% endif %}" style="background-color: {% if section.settings.text_style == 'semi' %}{{ block.settings.bg_color_content | color_modify: 'alpha', 0.8 }}{% else %}{{ block.settings.bg_color_content }}{% endif %}">
+                                    {% unless block.settings.title == blank %}
+                                        <div class="image-with-text__title image-with-text__title--{{ section.settings.heading_size }} section__title h2">
+                                            <h2 class="section__title-text"{% if block.settings.text_heading_color %} style="color:{{ settings.color_headings }}"{% endif %}>{{ block.settings.title | escape }}</h2>
+                                        </div>
+                                    {% endunless %}
+                                    {% unless block.settings.desc == blank %}
+                                        <div class="image-with-text__text rte">{{ block.settings.desc }}</div>
+                                    {% endunless %}
+                                    {% unless block.settings.link_title == blank %}
+                                        <a href="{{ block.settings.link }}" class="image-with-text__btn{% if section.settings.link_style == "hollow" or section.settings.link_style == "primary" %} c-btn c-btn--{{ section.settings.link_style }}{% elsif section.settings.link_style == "chevron" %} link link--arrow{% else %} link--underline{% endif %}">{{ block.settings.link_title | escape }}</a>
+                                    {% endunless %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+    </div>
+</section>
+{% endif %}
+
+{% if section.blocks.size == 0 %}
+    <div class="placeholder-noblocks">
+        {{ 'homepage.onboarding.no_content' | t }}
+    </div>
+{% endif %}
+
+{% schema %}
+{
+    "name": "Image with text overlap",
+    "class": "js-section__image-with-text-overlap",
+    "settings": [
+        {
+            "type": "select",
+            "id": "container",
+            "label": "Block width",
+            "default": "full",
+            "options": [
+                {
+                    "label": "Default",
+                    "value": "large"
+                },
+                {
+                    "label": "Narrow",
+                    "value": "small"
+                },
+                {
+                    "label": "Wide",
+                    "value": "full"
+                },
+                {
+                    "label": "Full width",
+                    "value": "full-width"
+                }
+            ]
+        },
+        {
+            "type": "range",
+            "id": "block_spacing",
+            "label": "Block spacing (desktop)",
+            "min": 0,
+            "max": 10,
+            "step": 1,
+            "default": 5
+        },
+        {
+            "type": "checkbox",
+            "id": "section-bottom-margin",
+            "label": "Reduce bottom margin",
+            "default": false
+        },
+        {
+            "type": "header",
+            "content": "Images"
+        },
+        {
+            "type": "select",
+            "id": "image_ratio",
+            "label": "Image ratio",
+            "default": "4:3",
+            "options": [
+                {
+                    "value": "1:1",
+                    "label": "Square (1:1)"
+                },
+                {
+                    "value": "3:4",
+                    "label": "Portrait (3:4)"
+                },
+                {
+                    "value": "4:3",
+                    "label": "Landscape (4:3)"
+                },
+                {
+                    "value": "16:9",
+                    "label": "Wide (16:9)"
+                },
+                {
+                    "value": "2:3",
+                    "label": "Tall (2:3)"
+                },
+                {
+                    "value": "natural",
+                    "label": "Natural"
+                }
+            ]
+        },
+        {
+            "type": "select",
+            "id": "block_layout",
+            "label": "Image width (desktop)",
+            "default": "2/3",
+            "options": [
+                {
+                    "value": "2/3",
+                    "label": "Two thirds"
+                },
+                {
+                    "value": "3/4",
+                    "label": "Three quarters"
+                }
+            ]
+        },
+        {
+            "type": "select",
+            "id": "block_align",
+            "label": "First block layout",
+            "default": "right",
+            "options": [
+                {
+                    "value": "left",
+                    "label": "Image left"
+                },
+                {
+                    "value": "right",
+                    "label": "Image right"
+                }
+            ]
+        },
+        {
+            "type": "header",
+            "content": "Design"
+        },
+        {
+            "type": "range",
+            "id": "heading_size",
+            "label": "Heading size",
+            "min": 1,
+            "max": 5,
+            "step": 1,
+            "default": 3
+        },
+        {
+            "type": "select",
+            "id": "link_style",
+            "label": "Link style",
+            "default": "hollow",
+            "options": [
+                {
+                    "value": "body",
+                    "label": "Body text"
+                },
+                {
+                    "value": "chevron",
+                    "label": "Chevron"
+                },
+                {
+                    "value": "primary",
+                    "label": "Solid Button"
+                },
+                {
+                    "value": "hollow",
+                    "label": "Outline button"
+                }
+            ]
+        },
+        {
+            "type": "select",
+            "id": "text_style",
+            "label": "Text background style (desktop)",
+            "default": "solid",
+            "options": [
+                {
+                    "label": "Solid",
+                    "value": "solid"
+                },
+                {
+                    "label": "Semi-opaque",
+                    "value": "semi"
+                }
+            ]
+        }
+    ],
+    "blocks": [
+        {
+            "type": "image",
+            "name": "Image block",
+            "settings": [
+                {
+                    "type": "image_picker",
+                    "id": "image",
+                    "label": "Image"
+                },
+                {
+                    "type": "text",
+                    "id": "title",
+                    "label": "Heading",
+                    "default": "Image with text"
+                },
+                {
+                    "type": "richtext",
+                    "id": "desc",
+                    "label": "Text",
+                    "default": "<p>Use these blocks to share your brand's story. You can focus on a particular collection, a product detail, or even embed a video.</p>"
+                },
+                {
+                    "type": "select",
+                    "id": "horizontal_align",
+                    "label": "Text alignment",
+                    "default": "left",
+                    "options": [
+                        {
+                            "value": "left",
+                            "label": "Left"
+                        },
+                        {
+                            "value": "center",
+                            "label": "Center"
+                        },
+                        {
+                            "value": "right",
+                            "label": "Right"
+                        }
+                    ]
+                },
+                {
+                    "type": "text",
+                    "id": "link_title",
+                    "label": "Link label",
+                    "default": "Learn more"
+                },
+                {
+                    "type": "url",
+                    "id": "link",
+                    "label": "Link"
+                },
+                {
+                    "type": "header",
+                    "content": "Colors"
+                },
+                {
+                    "type": "color",
+                    "id": "bg_color_block",
+                    "label": "Block background",
+                    "default": "rgba(0,0,0,0)"
+                },
+                {
+                    "type": "color",
+                    "id": "bg_color_content",
+                    "label": "Text background",
+                    "default": "#ffffff"
+                },
+                {
+                    "type": "color",
+                    "id": "color_text",
+                    "label": "Text and headings",
+                    "default": "#212121"
+                },
+                {
+                    "type": "checkbox",
+                    "id": "text_heading_color",
+                    "label": "Use default heading color",
+                    "default": false
+                },
+                {
+                    "type": "checkbox",
+                    "id": "text_border_color",
+                    "label": "Use default brand border color",
+                    "default": true
+                }
+            ]
+        },
+        {
+            "type": "video",
+            "name": "Video block",
+            "settings": [
+                {
+                    "type": "image_picker",
+                    "id": "image",
+                    "label": "Image"
+                },
+                {
+                    "type": "video_url",
+                    "id": "video",
+                    "label": "Video URL",
+                    "info" : "Accepts YouTube or Vimeo links. Video will play in a pop-up.",
+                    "accept": [
+                        "youtube",
+                        "vimeo"
+                    ]
+                },
+                {
+                    "type": "text",
+                    "id": "title",
+                    "label": "Heading",
+                    "default": "Image with text"
+                },
+                {
+                    "type": "richtext",
+                    "id": "desc",
+                    "label": "Text",
+                    "default": "<p>Use these blocks to share your brand's story. You can focus on a particular collection, a product detail, or even embed a video.</p>"
+                },
+                {
+                    "type": "select",
+                    "id": "horizontal_align",
+                    "label": "Text alignment",
+                    "default": "left",
+                    "options": [
+                        {
+                            "value": "left",
+                            "label": "Left"
+                        },
+                        {
+                            "value": "center",
+                            "label": "Center"
+                        },
+                        {
+                            "value": "right",
+                            "label": "Right"
+                        }
+                    ]
+                },
+                {
+                    "type": "text",
+                    "id": "link_title",
+                    "label": "Link label",
+                    "default": "Learn more"
+                },
+                {
+                    "type": "url",
+                    "id": "link",
+                    "label": "Link"
+                },
+                {
+                    "type": "header",
+                    "content": "Design"
+                },
+                {
+                    "type": "header",
+                    "content": "Colors"
+                },
+                {
+                    "type": "color",
+                    "id": "bg_color_block",
+                    "label": "Block background",
+                    "default": "#ffffff"
+                },
+                {
+                    "type": "color",
+                    "id": "bg_color_content",
+                    "label": "Text background",
+                    "default": "#ffffff"
+                },
+                {
+                    "type": "color",
+                    "id": "color_text",
+                    "label": "Text and headings",
+                    "default": "#212121"
+                },
+                {
+                    "type": "checkbox",
+                    "id": "text_heading_color",
+                    "label": "Use default heading color",
+                    "default": false
+                },
+                {
+                    "type": "checkbox",
+                    "id": "text_border_color",
+                    "label": "Use default brand border color",
+                    "default": true
+                }
+            ]
+        }
+    ],
+    "presets": [
+        {
+            "name": "Image with text overlap",
+            "blocks": [
+                {
+                    "type": "image",
+                    "settings": {
+                        "bg_color_block": "#f2f2f2"
+                    }
+                },
+                {
+                    "type": "image"
+                }
+            ]
+        }
+    ],
+    "enabled_on": {
+        "templates": ["*"],
+        "groups": ["footer"]
+    }
+}
+{% endschema %}

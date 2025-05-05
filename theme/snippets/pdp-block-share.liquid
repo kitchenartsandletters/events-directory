@@ -1,0 +1,50 @@
+{% comment %}
+    Renders product page social media share icons block
+
+    Accepts:
+    - block-align: {String}
+    - product-url: {String}
+    - product-title: {String}
+    - product-image: {Object}
+{% endcomment %}
+
+{% capture share_link %}{{ shop.url }}{{ product-url }}{% endcapture %}
+{% capture share_title %}{{ product-title | url_param_escape }}{% endcapture %}
+{% capture share_img %}{{ product-image | image_url: width: 1024, height: 1024 }}{% endcapture %}
+
+<div class="product-single__share">
+    <ul class="product-single__share-items o-list-bare" style="text-align: {{ block-align }}">
+        {% if settings.share_facebook %}
+        <li class="product-single__share-item">
+            <a href="//www.facebook.com/sharer.php?u={{ share_link }}" class="product-single__share-link icon-fallback" target="_blank" rel="noopener">
+                <i class="icon icon--facebook" aria-hidden="true"></i>
+                <span class="icon-fallback__text">Facebook</span>
+            </a>
+        </li>
+        {% endif %}
+        {% if settings.share_twitter %}
+        <li class="product-single__share-item">
+            <a href="//twitter.com/share?text={{ share_title }}&amp;url={{ share_link }}" class="product-single__share-link icon-fallback" target="_blank" rel="noopener">
+                <i class="icon icon--twitter" aria-hidden="true"></i>
+                <span class="icon-fallback__text">Twitter</span>
+            </a>
+        </li>
+        {% endif %}
+        {% if settings.share_pinterest %}
+        <li class="product-single__share-item">
+            <a href="http://pinterest.com/pin/create/button/?url={{ share_link }}&amp;media={{ share_img }}&amp;description={{ share_title }}" class="product-single__share-link icon-fallback" target="_blank" rel="noopener">
+                <i class="icon icon--pinterest" aria-hidden="true"></i>
+                <span class="icon-fallback__text">Pinterest</span>
+            </a>
+        </li>
+        {% endif %}
+        {% if settings.share_mail %}
+        <li class="product-single__share-item">
+            <a href="mailto:?body={{ share_title }} - {{ share_link }}" class="product-single__share-link icon-fallback">
+                <i class="icon icon--mail" aria-hidden="true"></i>
+                <span class="icon-fallback__text">Email</span>
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+</div>

@@ -1,0 +1,156 @@
+{%- liquid
+    assign product_limit = section.settings.related_grid_num | times: section.settings.related_grid_row
+    if section.settings.related_mobile_layout == 'carousel'
+        assign mobile_sizes = 'calc(100vw - 120px)'
+    elsif section.settings.grid_mobile == '2'
+        assign mobile_sizes = 'calc((100vw - 72px) / 2)'
+    else
+        assign mobile_sizes = 'calc(100vw - 36px)'
+    endif
+
+    case section.settings.related_grid_num
+        when 2
+            assign sizes = '(min-width: 1600px) calc((80vw - 90px) / 2), (min-width: 981px) calc((100vw - 90px) / 2), (min-width: 768px) calc((100vw - 66px) / 2), ' | append: mobile_sizes
+        when 3
+            assign sizes = '(min-width: 1600px) calc((80vw - 120px) / 3), (min-width: 981px) calc((100vw - 120px) / 3), (min-width: 768px) calc((100vw - 66px) / 2), ' | append: mobile_sizes
+        when 4
+            assign sizes = '(min-width: 1600px) calc((80vw - 105px) / 4), (min-width: 1081px) calc((100vw - 105px) / 4), (min-width: 981px) calc((100vw - 90px) / 3), (min-width: 768px) calc((100vw - 51px) / 2), ' | append: mobile_sizes
+        when 5
+            assign sizes = '(min-width: 1600px) calc((80vw - 105px) / 5), (min-width: 1081px) calc((100vw - 105px) / 5), (min-width: 981px) calc((100vw - 90px) / 4), (min-width: 768px) calc((100vw - 51px) / 3), ' | append: mobile_sizes
+
+    endcase
+-%}
+
+<div class="js-product-recommendations" data-url="{{ routes.product_recommendations_url }}?section_id={{ section.id }}&product_id={{ product.id }}&limit={{ product_limit }}" data-base-url="{{ routes.product_recommendations_url }}" data-product-id="{{ product.id }}" data-section-id="{{ section.id }}" data-limit="{{ product_limit }}">
+    <section class="section section--{{ section.id }} section--mb-s {% if section.settings.related_mobile_layout == 'carousel' %} section--mb-reset--mob{% endif %} section--recommended-products js-collection-section" data-section-id="{{ section.id }}" data-section-type="product-recommendations">
+        <div class="container container--{{ section.settings.section_width }}{% if section.settings.related_mobile_layout == 'carousel' %} container--mob-0{% endif %}">
+            {% if recommendations.products_count > 0 %}
+
+                {% if section.settings.related_title != blank %}
+                    <div class="section__title section__title--center">
+                        <h2 class="section__title-text">{{ section.settings.related_title | escape }}</h2>
+                    </div>
+                {% endif %}
+
+                <div class="recommended-products recommended-products--{{ section.settings.related_mobile_layout }} js-recommended-products" data-section-id="{{ section.id }}">
+                    <div class="grid-layout grid-layout--{{ section.settings.related_grid_num }} grid-layout--mob-{{ section.settings.grid_mobile }} grid-layout--align-center">
+                        {%- liquid
+                            assign small_buttons_on_mobile = false
+                            if section.settings.grid_mobile == '2' and section.settings.related_mobile_layout != 'carousel'
+                                assign small_buttons_on_mobile = true
+                            endif
+                        -%}
+                        {% for product in recommendations.products limit: product_limit %}
+                            {% render 'product-grid-item',
+                                product: product,
+                                page: 'recommendations',
+                                image_sizes: sizes,
+                                small_buttons_on_mobile: small_buttons_on_mobile
+                            %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                {% if section.settings.related_mobile_layout == "carousel" %}
+                    <ul class="recommended-products__nav" style="" role="tablist">
+                        {% for product in recommendations.products limit: product_limit %}
+                            <li class="recommended-products__nav--item recommended-products__nav--item-{{ forloop.index }}" role="presentation">
+                                <button class="recommended-products__nav--btn {% if forloop.index == 1 %}active{% endif %}" type="button" role="tab" id="recommended-products-control-{{forloop.index}}" aria-controls="recommended-products-control-{{forloop.index}}" aria-label="Scroll to item #{{forloop.index}} of {{ forloop.length }}" tabindex="-1">{{forloop.index}}</button>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+            {% endif %}
+        </div>
+    </section>
+</div>
+
+{% schema %}
+{
+    "name": "Product recommendations",
+    "class": "js-section__product-recommendations",
+    "settings": [
+        {
+          "type": "paragraph",
+          "content": "Dynamic recommendations use order and product information to change and improve over time. Learn more [Learn more](https://help.shopify.com/en/themes/development/recommended-products)"
+        },
+        {
+            "id": "related_title",
+            "type": "text",
+            "label": "Heading",
+            "default": "You may also like"
+        },
+        {
+            "type": "select",
+            "id": "section_width",
+            "label": "Section width",
+            "default": "large",
+            "options": [
+                {
+                    "label": "Default",
+                    "value": "large"
+                },
+                {
+                    "label": "Narrow",
+                    "value": "small"
+                },
+                {
+                    "label": "Wide",
+                    "value": "wide"
+                }
+            ]
+        },
+        {
+            "type": "select",
+            "id": "related_mobile_layout",
+            "label": "Mobile layout",
+            "default": "carousel",
+            "options": [
+                {
+                    "value": "carousel",
+                    "label": "Carousel"
+                },
+                {
+                    "value": "grid",
+                    "label": "Grid"
+                }
+            ]
+        },
+        {
+            "type": "range",
+            "id": "related_grid_num",
+            "label": "Products per row (wide screens)",
+            "min": 2,
+            "max": 5,
+            "step": 1,
+            "default": 3
+        },
+        {
+            "type": "select",
+            "id": "grid_mobile",
+            "label": "Products per row (mobile)",
+            "default": "1",
+            "options": [
+                {
+                    "label": "1",
+                    "value": "1"
+                },
+                {
+                    "label": "2",
+                    "value": "2"
+                }
+            ]
+        },
+        {
+            "type": "range",
+            "id": "related_grid_row",
+            "label": "Rows (grid layout only)",
+            "min": 1,
+            "max": 3,
+            "step": 1,
+            "default": 1
+        }
+    ]
+}
+{% endschema %}

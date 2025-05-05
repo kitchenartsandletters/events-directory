@@ -1,0 +1,8 @@
+<lazy-video>
+    <video class="{{ class }}" playsinline="playsinline" autoplay="autoplay" loop="loop" muted="muted" poster="{{ video.preview_image | img_url: 'medium' }}">
+        {% for src in video.sources %}
+            <source data-src="{{ src.url }}" type="video/{{ src.format }}">
+        {% endfor %}
+    </video>
+</lazy-video>
+<script src="{{ 'lazy-video.js' | asset_url }}" type="module"></script>

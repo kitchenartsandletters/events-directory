@@ -1,0 +1,22 @@
+{% comment %}
+    Renders product page tags block
+
+    Accepts:
+    - tags: {Object}
+    - label: {String}
+{% endcomment %}
+
+{%- if tags.size > 0 -%}
+    <div class="product-form__swatch__title">
+        <div class="u-flex u-flex--middle">
+            <span class="u-medium-small">{%- if label != blank -%}{{ label }}&nbsp;{%- endif -%}</span>
+            <ul class="product-form__swatch__sub-title o-list-inline o-list-inline--delimited u-mb0">
+                {% for tag in tags %}
+                    <li class="o-list-inline__item u-medium-small">
+                        <a class="u-color-text-lighter" href="/collections/all/{{ tag | handleize }}">{{ tag }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{%- endif -%}

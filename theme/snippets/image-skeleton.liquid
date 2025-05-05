@@ -1,0 +1,21 @@
+{% comment %}
+	Image skeleton background for smoother loading
+
+  Accepts:
+  - alt: {String} Image alt text
+  - width: {String} Image width
+  - height: {String} Image height
+{% endcomment %}
+
+<image-skeleton aria-label="{{ alt | escape }}">
+  <svg
+    id="visual"
+    viewBox="0 0 {{ width }} {{ height }}"
+    width="{{ width }}"
+    height="{{ height }}"
+    role="presentation"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <rect x="0" y="0" width="{{ width }}" height="{{ height }}"></rect>
+  </svg>
+</image-skeleton>

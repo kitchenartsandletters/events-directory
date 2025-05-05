@@ -1,0 +1,16 @@
+{% comment %}
+    Renders product page image block
+
+    Accepts:
+    - title: {String}
+    - link: {Object}
+    - style: {String}
+    - align: {String}
+    - new-tab: {Boolean}
+{% endcomment %}
+
+{% unless title == blank %}
+    <div class="product-form__link__wrapper" style="text-align: {{ align }}">
+        <a href="{{ link }}" class="product-form__link product-form__link--{{ style }}{% unless style == 'body' %} link link--{{ style }}{% endunless %}" {% if new-tab %} target="_blank"{% endif %}>{{ title | escape }}</a>
+    </div>
+{% endunless %}

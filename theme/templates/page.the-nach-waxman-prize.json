@@ -1,0 +1,56 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "58bc990c-37f5-434d-85b3-8d65ae01fbd6": {
+      "type": "section-image-text-banner",
+      "blocks": {
+        "template--14642785812613__58bc990c-37f5-434d-85b3-8d65ae01fbd6-text-1": {
+          "type": "text",
+          "disabled": true,
+          "settings": {
+            "text": "<p>The Nach Waxman Prize</p><p>for Food and Drink Scholarship</p>",
+            "text_size": 7,
+            "text_width": 60,
+            "text_size_mobile": 6,
+            "text_style": "heading"
+          }
+        }
+      },
+      "block_order": [
+        "template--14642785812613__58bc990c-37f5-434d-85b3-8d65ae01fbd6-text-1"
+      ],
+      "custom_css": [
+        "@media screen and (mid-width: 767px) {.p {line-height: 0.5; font-family: Libre Franklin Bold; }}"
+      ],
+      "settings": {
+        "section_height": "extra-small",
+        "section_height_mobile": "extra-small",
+        "section_width": "full",
+        "content_alignment": "center",
+        "content_color": "#ffffff",
+        "content_heading_color": false,
+        "bg_color": "rgba(0,0,0,0)",
+        "bg_image": "shopify://shop_images/KALWaxman.png",
+        "overlay_color": "#000000",
+        "overlay_strength": 10,
+        "section-bottom-margin": false
+      }
+    },
+    "main": {
+      "type": "main-page",
+      "settings": {}
+    }
+  },
+  "order": [
+    "58bc990c-37f5-434d-85b3-8d65ae01fbd6",
+    "main"
+  ]
+}

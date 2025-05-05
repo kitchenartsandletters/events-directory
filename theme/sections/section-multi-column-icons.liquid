@@ -1,0 +1,1046 @@
+{%- liquid
+    if section.settings.bg_color.alpha == 0 or section.settings.bg_color == settings.color_bg
+        assign section_bg = false
+    else
+        assign section_bg = true
+    endif
+
+    if section.settings.section-bottom-margin
+        assign margin_class = 'section--mb-0'
+    else
+        if section_bg == false and section.settings.link == blank
+            assign margin_class = 'section--mb-m'
+        endif
+    endif
+
+    if section.settings.color_text.alpha > 0
+        assign color_text = section.settings.color_text
+    else
+        assign color_text = settings.color_text
+    endif
+-%}
+
+<style>
+    .section--{{ section.id }} {
+        background: {{ section.settings.bg_color }};
+    }
+    .section--{{ section.id }} .o-ratio {
+        max-width: 100%;
+        min-width: 20px;
+        width: {{ section.settings.icon_size }}px;
+        margin-top: {{ section.settings.icon_padding | times: 4 }}px;
+        margin-bottom: {{ section.settings.icon_padding | times: 10 }}px;
+    }
+    @media screen and (max-width: 767px){
+        .section--{{ section.id }} .o-ratio {
+            margin-top: {{ section.settings.icon_padding | times: 2 }}px;
+            margin-bottom: {{ section.settings.icon_padding | times: 6 }}px;
+        }
+    }
+    .section--{{ section.id }} .section__title-text,
+    .section--{{ section.id }} .section__link  > * ,
+    .section--{{ section.id }} .multi-column__button > * ,
+    .section--{{ section.id }} .multi-column__title,
+    .section--{{ section.id }} .multi-column__sub-title,
+    .section--{{ section.id }} .multi-column__desc {
+        color: {{ color_text }};
+    }
+    .section--{{ section.id }} .multi-column__button .c-btn--primary {
+        color: {{ settings.color_button }}
+    }
+    .section--{{ section.id }} .multi-column__button .c-btn--hollow {
+        box-shadow: inset 0px 0px 0px 1px {{ color_text }};
+    }
+    .section--{{ section.id }} .multi-column__button .c-btn--hollow:hover {
+        {%- if section.settings.bg_color.alpha == 0 -%}
+            color: {{ settings.color_bg }};
+        {%- else -%}
+            color: {{ section.settings.bg_color }};
+        {%- endif -%}
+        background: {{ color_text }};
+        box-shadow: inset 0px 0px 0px 1px {{ color_text }};
+    }
+    .section--{{ section.id }} .multi-column__nav--item .multi-column__nav--btn,
+    .section--{{ section.id }} .multi-column__nav--item .multi-column__nav--btn.active,
+    .no-touchevents .section--{{ section.id }} .multi-column__nav--item .multi-column__nav--btn:hover {
+        background: {{ color_text }};
+    }
+
+    {% if section.settings.text_heading_color %}
+        .section--{{ section.id }} .section__title-text,
+        .section--{{ section.id }} .multi-column__title {
+          color: {{ settings.color_headings }};
+        }
+    {% endif %}
+    {% unless section.settings.text_border_color %}
+        .section--{{ section.id }} .section__title-text.section__title-text:after {
+            background: {{ color_text }};
+        }
+    {% endunless %}
+</style>
+
+<section class="section section--{{ section.id }} {{ margin_class }} {% if section_bg %}section--has-bg{% else %}section--no-bg{% endif %}{% if section.settings.divider == true %} section--divider{% if section_bg == false %} section--divider-p{% endif %}{% endif %}" data-section-id="{{ section.id }}" data-section-type="multi-column">
+
+    <div class="multi-column__wrapper multi-column__wrapper--icon">
+
+        <div class="container container--{{ section.settings.container }}{% if section.settings.grid > 3 %} container--tiny@tab{% endif %}{% if section.settings.grid == 6 %} container--tiny@desk{% endif %}{% if section.settings.mobile_layout == 'carousel' %} container--mob-0{% endif %}">
+
+            {% if section.settings.title != blank %}
+                <div class="section__title section__title--center{% unless section.settings.desc == blank %} section__title--desc{% endunless %}">
+                    <h2 class="section__title-text">{{ section.settings.title | escape }}</h2>
+                </div>
+            {% endif %}
+
+            <div class="multi-column multi-column--icon multi-column--{{ section.settings.mobile_layout }}">
+
+                <div class="multi-column__items">
+
+                    {%- liquid
+                        case section.settings.spacing
+                            when 1
+                                assign spacing_px = 12
+                            when 2
+                                assign spacing_px = 24
+                            when 3
+                                assign spacing_px = 30
+                            when 4
+                                assign spacing_px = 48
+                            when 5
+                                assign spacing_px = 60
+                        endcase
+
+                        assign gain_fraction = section.settings.heading_size | times: 0.15
+                    -%}
+                    <style type="text/css">
+                        .section--{{ section.id }} .multi-column__title {
+                            font-size: {{ section.settings.heading_size | times: 0.2 | times: gain_fraction | plus: 1 }}rem;
+                            line-height: {{ section.settings.heading_size | times: 0.07 | minus: 1.85 | abs }};
+                        }
+                        @media screen and (max-width: 767px) {
+                            .section--{{ section.id }} .multi-column__title {
+                                font-size: {{ section.settings.heading_size | times: 0.2 | times: gain_fraction | plus: 0.95 }}rem;
+                                line-height: {{ section.settings.heading_size | times: 0.07 | minus: 1.7 | abs }};
+                            }
+                        }
+                    </style>
+
+                    <div class="grid-layout grid-layout--align-center grid-layout--{{ section.settings.grid }} grid-layout--mob-{{ section.settings.grid_mobile }} grid-spacing--{{ spacing_px }}">
+
+                        {% for block in section.blocks %}
+
+                            <div class="multi-column__item multi-column__item--{{ section.settings.alignment }}">
+
+                                {% if block.settings.link != blank and section.settings.link_style == "column" %}
+                                    <a href="{{ block.settings.link }}" class="multi-column__column-link">
+                                {% endif %}
+
+                                    {% unless block.settings.icon == "none" %}
+
+                                        <div class="multi-column__media">
+                                            <div class="o-ratio">
+                                                <div class="o-ratio__content">
+                                                    <div class="multi-column__media-icon block--{{ block.id }}">
+                                                        {%- liquid
+                                                            if block.settings.color_icon.alpha > 0
+                                                                assign icon_color = block.settings.color_icon
+                                                            else
+                                                                assign icon_color = settings.color_text
+                                                            endif
+                                                        -%}
+                                                        {%- if block.settings.svg-code != blank -%}
+                                                            {{ block.settings.svg-code | replace: ' width=', ' ' | replace: ' height=', ' ' }}                       
+                                                        {%  else %}
+                                                            {% render 'icons', icon: block.settings.icon, icon-color: icon_color, block-id: block.id %}
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    {% endunless %}
+
+                                    <div class="multi-column__text{% if block.settings.image == blank %} multi-column__text--full{% endif %}">
+                                        {% unless block.settings.title == blank %}
+                                            <h3 class="multi-column__title">{{ block.settings.title | escape }}</h3>
+                                        {% endunless %}
+                                        {% unless block.settings.sub_title == blank %}
+                                            <h4 class="multi-column__sub-title h5">{{ block.settings.sub_title | escape }}</h4>
+                                        {% endunless %}
+                                        {% unless block.settings.desc == blank %}
+                                            <div class="multi-column__desc">
+                                                <div class="rte">{{ block.settings.desc }}</div>
+                                            </div>
+                                        {% endunless %}
+                                        {% unless block.settings.link == blank or section.settings.link_style == "column" %}
+                                            <div class="multi-column__button">
+                                                <a href="{{ block.settings.link }}" class="{% if section.settings.link_style == "hollow" or section.settings.link_style == "primary" %} c-btn c-btn--{{ section.settings.link_style }}{% elsif section.settings.link_style == "chevron" %} link link--arrow{% else %} link--underline{% endif %}">{{ block.settings.link_title }}</a>
+                                            </div>
+                                        {% endunless %}
+                                    </div>
+
+                                {% if block.settings.link != blank and section.settings.link_style == "column" %}
+                                    </a>
+                                {% endif %}
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                    {% if section.settings.mobile_layout == "carousel" %}
+                        <ul class="multi-column__nav" style="" role="tablist">
+
+                            {% for block in section.blocks %}
+                                <li class="multi-column__nav--item multi-column__nav--item-{{forloop.index}}" role="presentation">
+                                    <button class="multi-column__nav--btn {% if forloop.index == 1 %}active{% endif %}" type="button" role="tab" id="multi-column-control-{{forloop.index}}" aria-controls="multi-column-control-{{forloop.index}}" aria-label="Scroll to item #{{forloop.index}} of {{ forloop.length }}" tabindex="-1">{{forloop.index}}</button>
+                                </li>
+                            {% endfor %}
+
+                        </ul>
+                    {% endif %}
+
+                </div>
+            </div>
+
+            {% unless section.settings.link == blank %}
+                <div class="section__link section__link--center{% if section.settings.margin == true %} section--pb-m{% endif %}">
+                    <a href="{{ section.settings.link }}" class="link link--arrow section__link-link">{{ section.settings.link_title | escape }}</a>
+                </div>
+            {% endunless %}
+
+        </div>
+
+    </div>
+
+</section>
+
+{% if section.blocks.size == 0 %}
+    <div class="placeholder-noblocks">
+        {{ 'homepage.onboarding.no_content' | t }}
+    </div>
+{% endif %}
+
+{% schema %}
+{
+    "name": "Multicolumn with icons",
+    "class": "js-section__multi-column-icons",
+    "settings": [
+        {
+            "type": "text",
+            "id": "title",
+            "label": "Heading"
+        },
+        {
+            "type": "select",
+            "id": "container",
+            "label": "Layout width",
+            "default": "small",
+            "options": [
+                {
+                    "label": "Default",
+                    "value": "large"
+                },
+                {
+                    "label": "Narrow",
+                    "value": "small"
+                },
+                {
+                    "label": "Wide",
+                    "value": "full"
+                }
+            ]
+        },
+        {
+            "type": "text",
+            "id": "link_title",
+            "label": "Section link label",
+            "default": "Learn more"
+        },
+        {
+            "type": "url",
+            "id": "link",
+            "label": "Section link"
+        },
+        {
+            "type": "checkbox",
+            "id": "divider",
+            "label": "Show dividing line",
+            "default": false
+        },
+        {
+            "type": "checkbox",
+            "id": "section-bottom-margin",
+            "label": "Reduce bottom margin",
+            "default": false
+        },
+        {
+            "type": "header",
+            "content": "Columns"
+        },
+        {
+            "type": "range",
+            "id": "grid",
+            "label": "Columns per row (wide screens)",
+            "min": 2,
+            "max": 6,
+            "step": 1,
+            "default": 2
+        },
+        {
+            "type": "range",
+            "id": "spacing",
+            "label": "Column spacing (wide screens)",
+            "min": 1,
+            "max": 5,
+            "step": 1,
+            "default": 3
+        },
+        {
+            "type": "select",
+            "id": "alignment",
+            "label": "Column alignment",
+            "default": "center",
+            "options": [
+                {
+                    "label": "Left",
+                    "value": "left"
+                },
+                {
+                    "label": "Center",
+                    "value": "center"
+                },
+                {
+                    "label": "Right",
+                    "value": "right"
+                }
+            ]
+        },
+        {
+            "type": "select",
+            "id": "link_style",
+            "label": "Column link style",
+            "default": "hollow",
+            "options": [
+                {
+                    "value": "column",
+                    "label": "Column"
+                },
+                {
+                    "value": "body",
+                    "label": "Body text"
+                },
+                {
+                    "value": "chevron",
+                    "label": "Chevron"
+                },
+                {
+                    "value": "primary",
+                    "label": "Solid Button"
+                },
+                {
+                    "value": "hollow",
+                    "label": "Outline button"
+                }
+            ]
+        },
+        {
+            "type": "range",
+            "id": "heading_size",
+            "label": "Heading size",
+            "min": 1,
+            "max": 5,
+            "step": 1,
+            "default": 3
+        },
+        {
+            "type": "header",
+            "content": "Media"
+        },
+        {
+            "type": "range",
+            "id": "icon_size",
+            "label": "Icon size",
+            "unit": "px",
+            "min": 20,
+            "max": 200,
+            "step": 5,
+            "default": 30
+        },
+        {
+            "type": "range",
+            "id": "icon_padding",
+            "label": "Icon padding",
+            "min": 0,
+            "max": 5,
+            "step": 1,
+            "default": 0
+        },
+        {
+            "type": "header",
+            "content": "Colors"
+        },
+        {
+            "type": "color",
+            "id": "bg_color",
+            "label": "Section background",
+            "default": "rgba(0,0,0,0)"
+        },
+        {
+            "type": "color",
+            "id": "color_text",
+            "label": "Text and headings",
+            "default": "rgba(0,0,0,0)"
+        },
+        {
+            "type": "checkbox",
+            "id": "text_heading_color",
+            "label": "Use default heading color",
+            "default": false
+        },
+        {
+            "type": "checkbox",
+            "id": "text_border_color",
+            "label": "Use default brand border color",
+            "default": true
+        },
+        {
+            "type": "header",
+            "content": "Mobile"
+        },
+        {
+            "type": "select",
+            "id": "grid_mobile",
+            "label": "Columns per row",
+            "default": "1",
+            "options": [
+                {
+                    "label": "1",
+                    "value": "1"
+                },
+                {
+                    "label": "2",
+                    "value": "2"
+                }
+            ]
+        },
+        {
+            "type": "select",
+            "id": "mobile_layout",
+            "label": "Layout style",
+            "default": "carousel",
+            "info": "Only one column is in view when using carousel layout.",
+            "options": [
+                {
+                    "value": "carousel",
+                    "label": "Carousel"
+                },
+                {
+                    "value": "grid",
+                    "label": "Grid"
+                }
+            ]
+        }
+    ],
+    "blocks": [
+        {
+            "type": "text",
+            "name": "Column",
+            "settings": [
+                {
+                    "type": "select",
+                    "id": "icon",
+                    "label": "Icon",
+                    "default": "icon-check-circle-1",
+                    "options": [
+                        {
+                            "value": "none",
+                            "label": "none"
+                        },
+                        {
+                            "group": "Commerce",
+                            "value": "icon-crypto-currency-bitcoin-circle",
+                            "label": "bitcoin in circle"
+                        },
+                        {
+                            "group": "Commerce",
+                            "value": "icon-accounting-coins-stack",
+                            "label": "coin stack"
+                        },
+                        {
+                            "group": "Commerce",
+                            "value": "icon-credit-card",
+                            "label": "credit cards"
+                        },
+                        {
+                            "group": "Commerce",
+                            "value": "icon-discount-circle",
+                            "label": "discount in circle"
+                        },
+                        {
+                            "group": "Commerce",
+                            "value": "icon-currency-dollar-circle",
+                            "label": "dollar in circle"
+                        },
+                        {
+                            "group": "Commerce",
+                            "value": "icon-currency-euro-circle",
+                            "label": "euro in circle"
+                        },
+                        {
+                            "group": "Commerce",
+                            "value": "icon-gift-box",
+                            "label": "gift box"
+                        },
+                        {
+                            "group": "Commerce",
+                            "value": "icon-saving-piggy-bank",
+                            "label": "piggy-bank"
+                        },
+                        {
+                            "group": "Commerce",
+                            "value": "icon-currency-pound-circle",
+                            "label": "pound in circle"
+                        },
+                        {
+                            "group": "Commerce",
+                            "value": "icon-shopping-bag",
+                            "label": "shopping bag"
+                        },
+                        {
+                            "group": "Commerce",
+                            "value": "icon-shopping-basket",
+                            "label": "shopping basket"
+                        },
+                        {
+                            "group": "Commerce",
+                            "value": "icon-shopping-cart-empty-1",
+                            "label": "shopping cart"
+                        },
+                        {
+                            "group": "Commerce",
+                            "value": "icon-tags-1",
+                            "label": "shopping label"
+                        },
+                        {
+                            "group": "Commerce",
+                            "value": "icon-shop",
+                            "label": "store"
+                        },
+                        {
+                            "group": "Commerce",
+                            "value": "icon-currency-yuan-circle",
+                            "label": "yuan in circle"
+                        },
+                        {
+                            "group": "Communication",
+                            "value": "icon-conversation-chat-text",
+                            "label": "chat"
+                        },
+                        {
+                            "group": "Communication",
+                            "value": "icon-headphones-customer-support",
+                            "label": "customer support"
+                        },
+                        {
+                            "group": "Communication",
+                            "value": "icon-read-email-at",
+                            "label": "email symbol"
+                        },
+                        {
+                            "group": "Communication",
+                            "value": "icon-envelope",
+                            "label": "envelope"
+                        },
+                        {
+                            "group": "Communication",
+                            "value": "icon-social-media-facebook",
+                            "label": "facebook"
+                        },
+                        {
+                            "group": "Communication",
+                            "value": "icon-social-instagram",
+                            "label": "instagram"
+                        },
+                        {
+                            "group": "Communication",
+                            "value": "icon-light-bulb-shine",
+                            "label": "lightbulb"
+                        },
+                        {
+                            "group": "Communication",
+                            "value": "icon-like-1",
+                            "label": "like"
+                        },
+                        {
+                            "group": "Communication",
+                            "value": "icon-professional-network-linkedin",
+                            "label": "linkedin"
+                        },
+                        {
+                            "group": "Communication",
+                            "value": "icon-love-it",
+                            "label": "love"
+                        },
+                        {
+                            "group": "Communication",
+                            "value": "icon-megaphone",
+                            "label": "megaphone"
+                        },
+                        {
+                            "group": "Communication",
+                            "value": "icon-alarm-bell-1",
+                            "label": "notification bell"
+                        },
+                        {
+                            "group": "Communication",
+                            "value": "icon-question-circle",
+                            "label": "question in circle"
+                        },
+                        {
+                            "group": "Communication",
+                            "value": "icon-send-email",
+                            "label": "send"
+                        },
+                        {
+                            "group": "Communication",
+                            "value": "icon-mobile-phone",
+                            "label": "telephone"
+                        },
+                        {
+                            "group": "Communication",
+                            "value": "icon-social-media-tiktok",
+                            "label": "tiktok"
+                        },
+                        {
+                            "group": "Communication",
+                            "value": "icon-social-media-twitter",
+                            "label": "twitter"
+                        },
+                        {
+                            "group": "Communication",
+                            "value": "icon-video-player",
+                            "label": "video"
+                        },
+                        {
+                            "group": "Food and Drink",
+                            "value": "icon-fruit-apple",
+                            "label": "apple"
+                        },
+                        {
+                            "group": "Food and Drink",
+                            "value": "icon-flying-insect-bee-4",
+                            "label": "bee"
+                        },
+                        {
+                            "group": "Food and Drink",
+                            "value": "icon-fast-food-double-burger",
+                            "label": "burger"
+                        },
+                        {
+                            "group": "Food and Drink",
+                            "value": "icon-vegetables-carrot",
+                            "label": "carrot"
+                        },
+                        {
+                            "group": "Food and Drink",
+                            "value": "icon-champagne-cheers",
+                            "label": "champagne glasses"
+                        },
+                        {
+                            "group": "Food and Drink",
+                            "value": "icon-cocktail-martini",
+                            "label": "cocktail glass"
+                        },
+                        {
+                            "group": "Food and Drink",
+                            "value": "icon-coffee-cup",
+                            "label": "cup"
+                        },
+                        {
+                            "group": "Food and Drink",
+                            "value": "icon-donut",
+                            "label": "doughnut"
+                        },
+                        {
+                            "group": "Food and Drink",
+                            "value": "icon-pasta-bowl-warm",
+                            "label": "food bowl"
+                        },
+                        {
+                            "group": "Food and Drink",
+                            "value": "icon-ice-cream-stick",
+                            "label": "ice cream"
+                        },
+                        {
+                            "group": "Food and Drink",
+                            "value": "icon-ecology-leaf",
+                            "label": "leaf"
+                        },
+                        {
+                            "group": "Food and Drink",
+                            "value": "icon-organic-plant-grow-1",
+                            "label": "plant"
+                        },
+                        {
+                            "group": "Food and Drink",
+                            "value": "icon-asian-food-rice",
+                            "label": "rice bowl"
+                        },
+                        {
+                            "group": "Food and Drink",
+                            "value": "icon-rooster",
+                            "label": "rooster"
+                        },
+                        {
+                            "group": "Food and Drink",
+                            "value": "icon-seafood-fish",
+                            "label": "seafood"
+                        },
+                        {
+                            "group": "Food and Drink",
+                            "value": "icon-barbecue-steak",
+                            "label": "steak"
+                        },
+                        {
+                            "group": "Food and Drink",
+                            "value": "icon-fruit-watermelon",
+                            "label": "watermelon"
+                        },
+                        {
+                            "group": "Food and Drink",
+                            "value": "icon-farming-wheat",
+                            "label": "wheat"
+                        },
+                        {
+                            "group": "General",
+                            "value": "icon-matches-fire",
+                            "label": "fire"
+                        },
+                        {
+                            "group": "General",
+                            "value": "icon-flash",
+                            "label": "lightning"
+                        },
+                        {
+                            "group": "General",
+                            "value": "icon-maps-pin-1",
+                            "label": "map"
+                        },
+                        {
+                            "group": "General",
+                            "value": "icon-pin",
+                            "label": "map pin"
+                        },
+                        {
+                            "group": "General",
+                            "value": "icon-navigation-menu",
+                            "label": "navigation menu"
+                        },
+                        {
+                            "group": "General",
+                            "value": "icon-search-1",
+                            "label": "search icon"
+                        },
+                        {
+                            "group": "General",
+                            "value": "icon-single-neutral",
+                            "label": "user icon"
+                        },
+                        {
+                            "group": "Product",
+                            "value": "icon-book-close",
+                            "label": "book"
+                        },
+                        {
+                            "group": "Product",
+                            "value": "icon-camera-1",
+                            "label": "camera"
+                        },
+                        {
+                            "group": "Product",
+                            "value": "icon-diamond",
+                            "label": "diamond"
+                        },
+                        {
+                            "group": "Product",
+                            "value": "icon-download-bottom",
+                            "label": "download"
+                        },
+                        {
+                            "group": "Product",
+                            "value": "icon-tank-top-female-2",
+                            "label": "female shirt"
+                        },
+                        {
+                            "group": "Product",
+                            "value": "icon-footwear-heels-1",
+                            "label": "footwear heels"
+                        },
+                        {
+                            "group": "Product",
+                            "value": "icon-footwear-sneakers",
+                            "label": "footwear sneakers"
+                        },
+                        {
+                            "group": "Product",
+                            "value": "icon-headphones",
+                            "label": "headphones"
+                        },
+                        {
+                            "group": "Product",
+                            "value": "icon-picture-stack-landscape",
+                            "label": "images"
+                        },
+                        {
+                            "group": "Product",
+                            "value": "icon-laundry-retro-iron",
+                            "label": "iron"
+                        },
+                        {
+                            "group": "Product",
+                            "value": "icon-hospital-first-aid",
+                            "label": "medical"
+                        },
+                        {
+                            "group": "Product",
+                            "value": "icon-notes-list",
+                            "label": "notes"
+                        },
+                        {
+                            "group": "Product",
+                            "value": "icon-color-painting-palette",
+                            "label": "palette"
+                        },
+                        {
+                            "group": "Product",
+                            "value": "icon-pencil-2",
+                            "label": "pencil"
+                        },
+                        {
+                            "group": "Product",
+                            "value": "icon-pill",
+                            "label": "pill"
+                        },
+                        {
+                            "group": "Product",
+                            "value": "icon-recycling-sign",
+                            "label": "recycling"
+                        },
+                        {
+                            "group": "Product",
+                            "value": "icon-ruler",
+                            "label": "ruler"
+                        },
+                        {
+                            "group": "Product",
+                            "value": "icon-clothes-design-sewing-machine",
+                            "label": "sewing machine"
+                        },
+                        {
+                            "group": "Product",
+                            "value": "icon-shirt",
+                            "label": "shirt"
+                        },
+                        {
+                            "group": "Product",
+                            "value": "icon-fitness-jumping-rope",
+                            "label": "skipping rope"
+                        },
+                        {
+                            "group": "Product",
+                            "value": "icon-ice-snowflake",
+                            "label": "snowflake"
+                        },
+                        {
+                            "group": "Product",
+                            "value": "icon-glasses-retro",
+                            "label": "spectacles"
+                        },
+                        {
+                            "group": "Product",
+                            "value": "icon-clothes-design-tape-measure",
+                            "label": "tape measure"
+                        },
+                        {
+                            "group": "Product",
+                            "value": "icon-task-list-to-do",
+                            "label": "to do list"
+                        },
+                        {
+                            "group": "Product",
+                            "value": "icon-hammer-wrench",
+                            "label": "tools"
+                        },
+                        {
+                            "group": "Product",
+                            "value": "icon-trousers-calves-2",
+                            "label": "trousers"
+                        },
+                        {
+                            "group": "Product",
+                            "value": "icon-laundry-machine-2",
+                            "label": "washing machine"
+                        },
+                        {
+                            "group": "Shipping",
+                            "value": "icon-calendar-date",
+                            "label": "calendar"
+                        },
+                        {
+                            "group": "Shipping",
+                            "value": "icon-delivery-truck-3",
+                            "label": "delivery truck"
+                        },
+                        {
+                            "group": "Shipping",
+                            "value": "icon-shipment-give",
+                            "label": "hand shipment"
+                        },
+                        {
+                            "group": "Shipping",
+                            "value": "icon-shipment-package",
+                            "label": "package shipment"
+                        },
+                        {
+                            "group": "Shipping",
+                            "value": "icon-keyboard-arrow-return",
+                            "label": "return"
+                        },
+                        {
+                            "group": "Shipping",
+                            "value": "icon-sea-transport-boat",
+                            "label": "shipping"
+                        },
+                        {
+                            "group": "Shipping",
+                            "value": "icon-stopwatch",
+                            "label": "stopwatch"
+                        },
+                        {
+                            "group": "Shipping",
+                            "value": "icon-warehouse-cart-package-ribbon-1",
+                            "label": "warehouse package"
+                        },
+                        {
+                            "group": "Trust",
+                            "value": "icon-award-medal",
+                            "label": "award medal"
+                        },
+                        {
+                            "group": "Trust",
+                            "value": "icon-award-ribbon-star-1",
+                            "label": "award ribbon"
+                        },
+                        {
+                            "group": "Trust",
+                            "value": "icon-award-trophy-star-1",
+                            "label": "award trophy"
+                        },
+                        {
+                            "group": "Trust",
+                            "value": "icon-check-circle-1",
+                            "label": "checkmark in circle"
+                        },
+                        {
+                            "group": "Trust",
+                            "value": "icon-shield-check",
+                            "label": "checkmark in shield"
+                        },
+                        {
+                            "group": "Trust",
+                            "value": "icon-flag",
+                            "label": "flag"
+                        },
+                        {
+                            "group": "Trust",
+                            "value": "icon-single-neutral-id-card-3",
+                            "label": "ID card"
+                        },
+                        {
+                            "group": "Trust",
+                            "value": "icon-lock-2",
+                            "label": "lock"
+                        }
+                    ]
+                },               
+                {
+                    "type": "color",
+                    "id": "color_icon",
+                    "label": "Icon color",
+                    "default": "rgba(0,0,0,0)"
+                },
+                {
+                    "type": "html",
+                    "id": "svg-code",
+                    "label": "SVG icon code",
+                    "info": "Learn more about adding your own SVG icons [here](https://support.safeasmilk.co/article/236-general-add-custom-svg-icons-to-your-theme)."
+                },
+                {
+                    "type": "text",
+                    "id": "title",
+                    "label": "Heading",
+                    "default": "Column heading"
+                },
+                {
+                    "type": "text",
+                    "id": "sub_title",
+                    "label": "Subheading"
+                },
+                {
+                    "type": "richtext",
+                    "id": "desc",
+                    "label": "Text",
+                    "default": "<p>Describe the main features of your brand or products using a few lines of text and an icon.</p>"
+                },
+                {
+                    "type": "text",
+                    "id": "link_title",
+                    "label": "Link label",
+                    "default": "Learn more"
+                },
+                {
+                    "type": "url",
+                    "id": "link",
+                    "label": "Link"
+                }
+            ]
+        }
+    ],
+    "presets": [
+        {
+            "name": "Multicolumn with icons",
+            "blocks": [
+                {
+                    "type": "text",
+                    "settings": {
+                        "icon": "icon-love-it"
+                    }
+                },
+                {
+                    "type": "text",
+                    "settings": {
+                        "icon": "icon-sea-transport-boat"
+                    }
+                },
+                {
+                    "type": "text",
+                    "settings": {
+                        "icon": "icon-conversation-chat-text"
+                    }
+                },
+                {
+                    "type": "text",
+                    "settings": {
+                        "icon": "icon-clothes-design-sewing-machine"
+                    }
+                }
+            ]
+        }
+    ],
+    "enabled_on": {
+        "templates": ["*"],
+        "groups": ["header", "footer"]
+    }
+}
+{% endschema %}

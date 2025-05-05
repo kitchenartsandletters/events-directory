@@ -1,0 +1,15 @@
+{% comment %}
+    Renders product page text block
+
+    Accepts:
+    - title: {String}
+    - style: {String}
+    - text: {String}
+{% endcomment %}
+
+{%- if title != blank -%}
+    <h5 class="product-single__box__heading {{ style }}">{{ title | escape }}</h5>
+{%- endif -%}
+{%- if text != blank -%}
+    <div class="product-single__box__text rte">{{ text }}</div>
+{%- endif -%}

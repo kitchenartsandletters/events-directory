@@ -1,0 +1,156 @@
+<style type="text/css">
+    .section--{{ section.id }} .newsletter {
+        background-color: {{ section.settings.newsletter_bg }};
+    }
+    {% if section.settings.text_border_color %}
+        .section--{{ section.id }} .section__title-text.section__title-text::after {
+            background: {{ settings.color_header_border }};
+        }
+    {% endif %}
+</style>
+<section class="section section-newsletter section--{{ section.id }}{% if section.settings.section-bottom-margin %}{% if section.settings.section_width == 'contained' %} section--mb-m{% else %} section--mb-0{% endif %}{% endif %}" data-section-id="{{ section.id }}" data-section-type="home-newsletter">
+
+    <div class="container {% if section.settings.section_width == 'contained' %}container--large{% else %}container--full container--p-0{% endif %}">
+
+        <div class="newsletter newsletter--{{ section.settings.newsletter_style }}{% if section.settings.divider and section.settings.section_width != 'contained' %} newsletter_divider--{{ section.settings.newsletter_style }}{% endif %}">
+            <div class="newsletter__content container {% if section.settings.section_width == 'large' %}container--large{% endif %}">
+
+                <div class="newsletter__title section__title section__title--center">
+                    {% if section.settings.section_newsletter_title != blank %}
+                        <h2 class="section__title-text{% if section.settings.default_title_color %} newsletter__title-text--default{% endif %}">{{ section.settings.section_newsletter_title | escape }}</h2>
+                    {% endif %}
+                    {% if section.settings.section_newsletter_desc != blank %}
+                        <div class="section__title-desc rte">{{ section.settings.section_newsletter_desc }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="newsletter__form-wrapper">
+                    {% form 'customer', id: 'newsletter', class: 'newsletter__form-form' %}
+                        {{ form.errors | default_errors }}
+                        {% if form.posted_successfully? %}
+                            <div class="newsletter__form-message">
+                                <h3 class="newsletter__form-message__text">{{ 'general.newsletter_form.confirmation' | t }}</h3>
+                            </div>
+                        {% else %}
+                            <div class="o-layout o-layout--flush">
+                                <div class="o-layout__item u-1/1 u-7/8@tab u-2/3@desk">
+                                    <input type="hidden" name="contact[tags]" value="newsletter">
+                                    <label for="Email-{{ section.id }}" class="u-hidden-visually">Email</label>
+                                    <input type="email"
+                                            name="contact[email]"
+                                            id="Email-{{ section.id }}"
+                                            class="newsletter__input"
+                                            value="{% if customer %}{{ customer.email }}{% endif %}"
+                                            placeholder="{{ 'general.newsletter_form.newsletter_email' | t }}"
+                                            autocorrect="off"
+                                            autocapitalize="off">
+                                </div>
+                                <div class="o-layout__item u-1/1 u-7/8@tab u-1/3@desk">
+                                    <button type="submit" class="c-btn c-btn--full c-btn--primary newsletter__btn" name="commit" id="Subscribe-Footer">{{ 'general.newsletter_form.submit' | t }}</button>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endform %}
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+{% schema %}
+{
+    "name": "Newsletter",
+    "class": "js-section__newsletter",
+    "settings": [
+        {
+            "type": "checkbox",
+            "id": "divider",
+            "label": "Show dividing line",
+            "default": false,
+            "info": "Line does not show when using 'Contained' section width."
+        },
+        {
+            "type": "checkbox",
+            "id": "section-bottom-margin",
+            "label": "Reduce bottom margin",
+            "default": false
+        },
+        {
+            "type": "select",
+            "id": "section_width",
+            "label": "Section width",
+            "default": "contained",
+            "options": [
+                {
+                    "value": "contained",
+                    "label": "Contained"
+                },
+                {
+                    "value": "large",
+                    "label": "Full"
+                }
+            ]
+        },
+        {
+            "type": "color",
+            "id": "newsletter_bg",
+            "label": "Background color",
+            "default": "#F2F2F2"
+        },
+        {
+            "type": "select",
+            "id": "newsletter_style",
+            "label": "Text color",
+            "default": "dark",
+            "options": [
+                {
+                    "value": "dark",
+                    "label": "Dark"
+                },
+                {
+                    "value": "light",
+                    "label": "Light"
+                }
+            ]
+        },
+        {
+            "type": "checkbox",
+            "id": "default_title_color",
+            "label": "Use default heading color",
+            "default": false
+        },
+        {
+            "type": "checkbox",
+            "id": "text_border_color",
+            "label": "Use default brand border color",
+            "default": true
+        },
+        {
+            "type": "text",
+            "id": "section_newsletter_title",
+            "label": "Heading",
+            "default": "Newsletter"
+        },
+        {
+            "type": "richtext",
+            "id": "section_newsletter_desc",
+            "label": "Text",
+            "default": "<p>Let your customers know what to expect if they sign up to your mailing list. A discount code or the latest news from your brand.</p>"
+        },
+        {
+            "type": "paragraph",
+            "content": "Every sign up will create a 'Customer account' in this store. [Manage customers](/admin/customers?query=&accepts_marketing=1)"
+        }
+    ],
+    "presets": [
+        {
+            "name": "Newsletter"
+        }
+    ],
+    "enabled_on": {
+        "templates": ["*"],
+        "groups": ["header", "footer"]
+    }
+}
+{% endschema %}

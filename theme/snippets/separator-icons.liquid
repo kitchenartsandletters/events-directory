@@ -1,0 +1,226 @@
+{%- if icon != 'none' -%}
+
+  <svg
+    class="separator-icon-selection separator-icon-selection--{{ icon-color }}"
+    aria-hidden="true"
+    focusable="false"
+    role="presentation"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 48 48"
+    fill="none">
+
+    {%- case icon -%}
+
+      {%- when 'separator-arrow-left' -%}
+      <path
+        xmlns="http://www.w3.org/2000/svg"
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M21.1599 10L8.43272 22.6171L7 24.0375L8.43272 25.4578L21.1599 38.0749L23.976 35.2343L14.699 26.0375H41.0011V22.0375L14.699 22.0375L23.976 12.8407L21.1599 10Z"
+        fill="{{ icon-color }}" />
+
+      {%- when 'separator-arrow-right' -%}
+      <path
+        xmlns="http://www.w3.org/2000/svg"
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M26.8411 10L39.5683 22.6171L41.001 24.0375L39.5683 25.4578L26.8411 38.0749L24.025 35.2343L33.3019 26.0375L6.99989 26.0375V22.0375L33.302 22.0375L24.025 12.8407L26.8411 10Z"
+        fill="{{ icon-color }}" />
+
+      {%- when 'separator-asterisk' -%}
+      <path
+        xmlns="http://www.w3.org/2000/svg"
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M28.8281 26H39V22H28.8284L36.0208 14.8076L33.1923 11.9791L25.9999 19.1716V9H21.9999V19.1718L14.8074 11.9793L11.979 14.8077L19.1712 22H9V26H19.1715L11.9791 33.1923L14.8076 36.0208L21.9999 28.8285V39H25.9999V28.8286L33.1922 36.0209L36.0206 33.1925L28.8281 26Z"
+        fill="{{ icon-color }}" />
+
+      {%- when 'separator-bullet' -%}
+      <circle
+        xmlns="http://www.w3.org/2000/svg"
+        cx="24"
+        cy="24"
+        r="10"
+        fill="{{ icon-color }}" />
+
+      {%- when 'separator-bullet-outline' -%}
+      <circle
+        xmlns="http://www.w3.org/2000/svg"
+        cx="24"
+        cy="24"
+        r="8.5"
+        stroke="{{ icon-color }}"
+        stroke-width="3"
+        fill="none" />
+
+      {%- when 'separator-check' -%}
+      <path
+        xmlns="http://www.w3.org/2000/svg"
+        d="M8 24L13.3333 29.5L18.6667 35L40 13"
+        stroke="{{ icon-color }}"
+        stroke-width="4"
+        fill="none" />
+
+      {%- when 'separator-dash' -%}
+      <path
+        xmlns="http://www.w3.org/2000/svg"
+        d="M9 24L39 24"
+        stroke="{{ icon-color }}"
+        stroke-width="4" />
+
+      {%- when 'separator-diamond' -%}
+      <rect
+        xmlns="http://www.w3.org/2000/svg"
+        x="24"
+        y="9.85785"
+        width="20"
+        height="20"
+        transform="rotate(45 24 9.85785)"
+        fill="{{ icon-color }}" />
+
+      {%- when 'separator-diamond-outline' -%}
+      <rect
+        xmlns="http://www.w3.org/2000/svg"
+        x="24"
+        y="11.9792"
+        width="17"
+        height="17"
+        transform="rotate(45 24 11.9792)"
+        stroke="{{ icon-color }}"
+        stroke-width="3"
+        fill="none" />
+
+      {%- when 'separator-hexagon' -%}
+      <path
+        xmlns="http://www.w3.org/2000/svg"
+        d="M25 14L34.5263 19.5V30.5L25 36L15.4737 30.5V19.5L25 14Z"
+        fill="{{ icon-color }}" />
+
+      {%- when 'separator-hexagon-outline' -%}
+      <path
+        xmlns="http://www.w3.org/2000/svg"
+        d="M16.9737 20.366L25 15.7321L33.0263 20.366V29.634L25 34.268L16.9737 29.634V20.366Z"
+        stroke="{{ icon-color }}"
+        stroke-width="3"
+        fill="none" />
+
+      {%- when 'separator-hyphen' -%}
+      <path
+        xmlns="http://www.w3.org/2000/svg"
+        d="M16 24L32 24"
+        stroke="{{ icon-color }}"
+        stroke-width="4" />
+
+      {%- when 'separator-pipe' -%}
+      <path
+        xmlns="http://www.w3.org/2000/svg"
+        d="M24 43V5"
+        stroke="{{ icon-color }}"
+        stroke-width="4" />
+
+      {%- when 'separator-pipe-thin' -%}
+      <path
+        xmlns="http://www.w3.org/2000/svg"
+        d="M24 43V5"
+        stroke="{{ icon-color }}"
+        stroke-width="2" />
+
+      {%- when 'separator-plus' -%}
+      <path
+        xmlns="http://www.w3.org/2000/svg"
+        d="M23.9999 38V10"
+        stroke="{{ icon-color }}"
+        stroke-width="4" />
+      <path
+        xmlns="http://www.w3.org/2000/svg"
+        d="M10 24L38 24"
+        stroke="{{ icon-color }}"
+        stroke-width="4" />
+
+      {%- when 'separator-quad-diamond' -%}
+      <rect
+        xmlns="http://www.w3.org/2000/svg"
+        x="24"
+        y="10"
+        width="8.201"
+        height="8.201"
+        transform="rotate(45 24 10)"
+        fill="{{ icon-color }}" />
+      <rect
+        xmlns="http://www.w3.org/2000/svg"
+        x="24"
+        y="26.402"
+        width="8.201"
+        height="8.201"
+        transform="rotate(45 24 26.402)"
+        fill="{{ icon-color }}" />
+      <rect
+        xmlns="http://www.w3.org/2000/svg"
+        x="32.2007"
+        y="18.201"
+        width="8.201"
+        height="8.201"
+        transform="rotate(45 32.2007 18.201)"
+        fill="{{ icon-color }}" />
+      <rect
+        xmlns="http://www.w3.org/2000/svg"
+        x="15.799"
+        y="18.201"
+        width="8.201"
+        height="8.201"
+        transform="rotate(45 15.799 18.201)"
+        fill="{{ icon-color }}" />
+
+      {%- when 'separator-slash' -%}
+      <path
+        xmlns="http://www.w3.org/2000/svg"
+        d="M15.5 38.7224L32.5 9.27758"
+        stroke="{{ icon-color }}"
+        stroke-width="3" />
+
+
+      {%- when 'separator-square' -%}
+      <rect
+        xmlns="http://www.w3.org/2000/svg"
+        x="14"
+        y="14"
+        width="20"
+        height="20"
+        fill="{{ icon-color }}" />
+
+      {%- when 'separator-square-outline' -%}
+      <rect
+        xmlns="http://www.w3.org/2000/svg"
+        x="15.5"
+        y="15.5"
+        width="17"
+        height="17"
+        stroke="{{ icon-color }}"
+        stroke-width="3"
+        fill="none" />
+
+      {%- when 'separator-star' -%}
+      <path
+        xmlns="http://www.w3.org/2000/svg"
+        d="M24 7L27.917 18.6087L40.168 18.7467L30.3378 26.0593L33.9923 37.7533L24 30.664L14.0077 37.7533L17.6622 26.0593L7.83204 18.7467L20.083 18.6087L24 7Z"
+        fill="{{ icon-color }}" />
+
+      {%- when 'separator-triangle' -%}
+      <path
+        xmlns="http://www.w3.org/2000/svg"
+        d="M23.7018 13L36.4035 35H11L23.7018 13Z"
+        fill="{{ icon-color }}" />
+
+      {%- when 'separator-triangle-outline' -%}
+      <path
+        xmlns="http://www.w3.org/2000/svg"
+        d="M13.5981 33.5L23.7018 16L33.8054 33.5H13.5981Z"
+        stroke="{{ icon-color }}"
+        stroke-width="3"
+        fill="none" />
+
+
+    {%- endcase -%}
+
+  </svg>
+{%- endif -%}

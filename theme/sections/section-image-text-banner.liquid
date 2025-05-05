@@ -1,0 +1,470 @@
+{%- assign text_color_brightness = section.settings.content_color | color_brightness -%}
+<style>
+.section--{{ section.id }} .home-intro__bg--overlay:before,
+.section--{{ section.id }} .home-intro__bg--cover:before {
+    background: {{ section.settings.overlay_color }};
+    {% if section.settings.overlay_strength == 100 %}
+        opacity: 1;
+    {% else %}
+        opacity: .{{ section.settings.overlay_strength }};
+    {% endif %}
+}
+.section--{{ section.id }} .home-intro__link.link,
+.section--{{ section.id }} .home-intro__link.link-body,
+.section--{{ section.id }} .home-intro__text,
+.section--{{ section.id }} .home-intro__text .rte a {
+    color: {{ section.settings.content_color }};
+}
+.section--{{ section.id }} .c-btn--hollow {
+    color: {{ section.settings.content_color }};
+    box-shadow: inset 0px 0px 0px 1px {{ section.settings.content_color }};
+}
+.section--{{ section.id }} .c-btn--hollow:hover {
+    color: {% if text_color_brightness < 125 %}white{% else %}black{% endif %};
+    background-color: {{ section.settings.content_color }};
+}
+{% if section.settings.content_heading_color %}
+    .section--{{ section.id }} .home-intro__text--heading,
+    .section--{{ section.id }} .home-intro__text--heading .rte a {
+      color: {{ settings.color_headings }};
+    }
+{% endif %}
+</style>
+
+<section class="section section--{{ section.id }} section--{{ section.settings.section_width }} {% if section.settings.section-bottom-margin %}{% if section.settings.section_width == 'contained' %} section--mb-m{% else %} section--mb-0{% endif %}{% endif %}" data-section-id="{{ section.id }}" data-section-type="home-intro">
+
+    {% if section.settings.section_width == 'contained' %}<div class="container">{% endif %}
+
+        <div class="u-flex-parent">
+            <div class="home-intro home-intro--{{ section.settings.section_height }} home-intro--mobile-{{ section.settings.section_height_mobile }} home-intro--{{ section.settings.section_width }} u-flex u-flex--middle" style="background-color: {{ section.settings.bg_color }}">
+
+                {%- liquid
+                    if section.settings.bg_image == blank and section.settings.bg_color.alpha > 0
+                        assign use_bg_color = true
+                    else
+                        assign use_bg_color = false
+                    endif
+                -%}
+
+                {% unless use_bg_color %}
+
+                    {% if section.settings.bg_image != blank %}
+                        <div class="home-intro__bg--cover u-bg-contain" style="background-image: url('{{ section.settings.bg_image | img_url: '1x1' }}')"></div>
+                        <img
+                            class="home-intro__bg home-intro__bg--{{ section.id }}"
+                            src="{{ section.settings.bg_image | img_url: '300x' }}"
+                            srcset="{% render 'bgset', image: section.settings.bg_image %}"
+                            width="300"
+                            height="{{ 300 | divided_by: section.settings.bg_image.aspect_ratio | round }}"
+                            alt="{{ section.settings.bg_image.alt }}"
+                            loading="lazy"
+                            style="object-position:{{ section.settings.bg_image.presentation.focal_point }}"
+                        />
+                    {% else %}
+                        <style type="text/css">
+                        .section--{{ section.id }} .home-intro__bg--placeholder:before {
+                            background: {{ section.settings.overlay_color }};
+                        }
+                        </style>
+                        <div class="placeholder-svg__wrapper home-intro__bg home-intro__bg--placeholder">
+                            {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                        </div>
+                    {% endif %}
+                    <div class="home-intro__bg--overlay u-bg-overlay"></div>
+
+                {% endunless %}
+
+                <div class="home-intro__content home-intro__content--{{ section.settings.content_alignment }}">
+
+                    {%- for block in section.blocks -%}
+                        {%- case block.type -%}
+                        {%- when 'text' -%}
+                            <div class="home-intro__content__block home-intro__content__block--{{ block.type }}" {{ block.shopify_attributes }}>
+
+                                {%- assign gain_fraction = block.settings.text_size | times: 0.2 -%}
+                                {%- assign gain_fraction_mobile = block.settings.text_size_mobile | times: 0.2 -%}
+                                <style>
+                                    .home-intro__text--{{ block.id }} {
+                                        font-size: {{ block.settings.text_size | times: 0.2 | times: gain_fraction | plus: 1 }}rem;
+                                        line-height: {{ block.settings.text_size | times: 0.05 | minus: 1.8 | abs }};
+                                    }
+                                    @media screen and (max-width: 767px) {
+                                        .home-intro__text--{{ block.id }} {
+                                            font-size: {{ block.settings.text_size_mobile | times: 0.2 | times: gain_fraction_mobile | plus: 1 }}rem;
+                                            line-height: {{ block.settings.text_size_mobile | times: 0.05 | minus: 1.7 | abs }};
+                                        }
+                                    }
+                                </style>
+
+                                <div class="home-intro__text home-intro__text--{{ block.settings.text_style }} home-intro__text--{{ block.id }}" style="max-width:{{ block.settings.text_width | times: 15 }}px">
+                                    <div class="rte">{{ block.settings.text }}</div>
+                                </div>
+                            </div>
+
+                        {%- when 'image' -%}
+                            {% unless block.settings.inline_image == blank %}
+                                <div class="home-intro__content__block home-intro__content__block--{{ block.type }}" {{ block.shopify_attributes }}>
+                                    <div class="home-intro__media">
+                                        {%- assign img_url = block.settings.inline_image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+                                        <img
+                                            class="home-intro__media-img"
+                                            src="{{ block.settings.inline_image | image_url: width: 300 }}"
+                                            srcset="
+                                                {{ block.settings.inline_image | image_url: width: 180 }} 180w {{ 180 | divided_by: block.settings.inline_image.aspect_ratio | round }}h,
+                                                {{ block.settings.inline_image | image_url: width: 360 }} 360w {{ 360 | divided_by: block.settings.inline_image.aspect_ratio | round }}h,
+                                                {{ block.settings.inline_image | image_url: width: 540 }} 540w {{ 540 | divided_by: block.settings.inline_image.aspect_ratio | round }}h,
+                                                {{ block.settings.inline_image | image_url: width: 720 }} 720w {{ 720 | divided_by: block.settings.inline_image.aspect_ratio | round }}h,
+                                                {{ block.settings.inline_image | image_url: width: 900 }} 900w {{ 900 | divided_by: block.settings.inline_image.aspect_ratio | round }}h,
+                                                {{ block.settings.inline_image | image_url: width: 1080 }} 1080w {{ 1080 | divided_by: block.settings.inline_image.aspect_ratio | round }}h
+                                            "
+                                            width="300"
+                                            height="{{ 300 | divided_by: block.settings.inline_image.aspect_ratio | round }}"
+                                            alt="{{ block.settings.inline_image.alt }}"
+                                            loading="lazy"
+                                            style="width: {{ block.settings.inline_image_width }}px; border-radius: {{ block.settings.inline_image_radius }}px;"
+                                        />
+                                    </div>
+                                </div>
+                            {% endunless %}
+
+                        {%- when 'video' -%}
+                            {% unless block.settings.video == blank %}
+                                <div class="home-intro__content__block home-intro__content__block--{{ block.type }}" {{ block.shopify_attributes }}>
+                                    {% capture video_url %}{% if block.settings.video.type == 'youtube' %}//www.youtube.com/watch?v={{ block.settings.video.id }}{% elsif block.settings.video.type == 'vimeo' %}//vimeo.com/{{ block.settings.video.id }}{% endif %}{% endcapture %}
+                                    <div class="home-intro__video">
+                                        <a href="{{ video_url }}" class="home-intro__btn c-btn c-btn--primary c-btn--play icon-fallback js-no-transition js-pop-video">
+                                            <i class="icon icon--play" aria-hidden="true"></i>
+                                            <span class="icon-fallback__text">{{ 'sections.video.play_label' | t }}</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endunless %}
+
+                        {%- when 'link' -%}
+                            {% unless block.settings.link_title == blank %}
+                                <div class="home-intro__content__block home-intro__content__block--{{ block.type }}" {{ block.shopify_attributes }}>
+                                    <div class="home-intro__link-wrap">
+                                        <a href="{{ block.settings.link }}" class="home-intro__link {{ block.settings.link_style }}">{{ block.settings.link_title | escape }}</a>
+                                    </div>
+                                </div>
+                            {% endunless %}
+
+                        {%- endcase -%}
+                    {%- endfor -%}
+
+                </div>
+
+            </div>
+        </div>
+    {% if section.settings.section_width == 'contained' %}</div>{% endif %}
+</section>
+
+{% schema %}
+{
+    "name": "Image and text banner",
+    "class": "js-section__home-intro",
+    "settings": [
+        {
+            "type": "select",
+            "id": "section_height",
+            "label": "Section height (wide screens)",
+            "options": [
+                {
+                    "label": "Extra small",
+                    "value": "extra-small"
+                },
+                {
+                    "label": "Small",
+                    "value": "small"
+                },
+                {
+                    "label": "Medium",
+                    "value": "medium"
+                },
+                {
+                    "label": "Large",
+                    "value": "large"
+                },
+                {
+                    "label": "Extra large",
+                    "value": "x-large"
+                }
+            ],
+            "default": "medium"
+        },
+        {
+            "type": "select",
+            "id": "section_height_mobile",
+            "label": "Section height (mobile)",
+            "options": [
+                {
+                    "label": "Extra small",
+                    "value": "extra-small"
+                },
+                {
+                    "label": "Small",
+                    "value": "small"
+                },
+                {
+                    "label": "Medium",
+                    "value": "medium"
+                },
+                {
+                    "label": "Large",
+                    "value": "large"
+                },
+                {
+                    "label": "Extra large",
+                    "value": "x-large"
+                }
+            ],
+            "default": "medium"
+        },
+        {
+            "type": "select",
+            "id": "section_width",
+            "label": "Section width",
+            "default": "contained",
+            "options": [
+                {
+                    "label": "Contained",
+                    "value": "contained"
+                },
+                {
+                    "label": "Full",
+                    "value": "full"
+                }
+            ]
+        },
+        {
+            "type": "select",
+            "id": "content_alignment",
+            "label": "Content alignment",
+            "options": [
+                {
+                    "label": "Left",
+                    "value": "left"
+                },
+                {
+                    "label": "Center",
+                    "value": "center"
+                },
+                {
+                    "label": "Right",
+                    "value": "right"
+                }
+            ],
+            "default": "center"
+        },
+        {
+            "type": "color",
+            "id": "content_color",
+            "label": "Content color",
+            "default": "#ffffff"
+        },
+        {
+            "type": "checkbox",
+            "id": "content_heading_color",
+            "label": "Use default heading color",
+            "default": false
+        },
+        {
+            "type": "color",
+            "id": "bg_color",
+            "label": "Background color",
+            "default": "rgba(0,0,0,0)"
+        },
+        {
+            "type": "image_picker",
+            "id": "bg_image",
+            "label": "Background image",
+            "info": "2200px width recommended."
+        },
+        {
+            "type": "color",
+            "id": "overlay_color",
+            "label": "Overlay color",
+            "default": "#000000"
+        },
+        {
+            "type": "range",
+            "id": "overlay_strength",
+            "label": "Overlay strength",
+            "unit": "%",
+            "min": 0,
+            "max": 100,
+            "step": 10,
+            "default": 10
+        },
+        {
+            "type": "checkbox",
+            "id": "section-bottom-margin",
+            "label": "Reduce bottom margin",
+            "default": false
+        }
+    ],
+    "blocks": [
+        {
+            "type": "text",
+            "name": "Text",
+            "settings": [
+                {
+                    "type": "richtext",
+                    "id": "text",
+                    "label": "Text",
+                    "default": "<p>Offer some insight into your brand and history. Use images, text and video to describe your value proposition.</p>"
+                },
+                {
+                    "type": "range",
+                    "id": "text_size",
+                    "label": "Text size (wide screens)",
+                    "min": 1,
+                    "max": 15,
+                    "step": 1,
+                    "default": 3
+                },
+                {
+                    "type": "range",
+                    "id": "text_width",
+                    "label": "Text width (wide screens)",
+                    "min": 10,
+                    "max": 100,
+                    "step": 5,
+                    "default": 40
+                },
+                {
+                    "type": "range",
+                    "id": "text_size_mobile",
+                    "label": "Text size (mobile)",
+                    "min": 1,
+                    "max": 10,
+                    "step": 1,
+                    "default": 3
+                },
+                {
+                    "type": "select",
+                    "id": "text_style",
+                    "label": "Font style",
+                    "options": [
+                        {
+                            "value": "body",
+                            "label": "Body"
+                        },
+                        {
+                            "value": "heading",
+                            "label": "Heading"
+                        }
+                    ],
+                    "default": "body"
+                }
+            ]
+        },
+        {
+            "type": "image",
+            "name": "Inline image",
+            "settings": [
+                {
+                    "type": "image_picker",
+                    "id": "inline_image",
+                    "label": "Image"
+                },
+                {
+                    "type": "range",
+                    "id": "inline_image_width",
+                    "label": "Image width",
+                    "unit": "px",
+                    "min": 50,
+                    "max": 800,
+                    "step": 10,
+                    "default": 200
+                },
+                {
+                    "type": "range",
+                    "id": "inline_image_radius",
+                    "label": "Image corner radius",
+                    "min": 0,
+                    "max": 30,
+                    "step": 1,
+                    "unit": "px",
+                    "default": 0
+                }
+            ]
+        },
+        {
+            "type": "video",
+            "name": "Popup video",
+            "settings": [
+                {
+                    "type": "video_url",
+                    "id": "video",
+                    "label": "YouTube or Vimeo link",
+                    "accept": ["youtube", "vimeo"]
+                }
+            ]
+        },
+        {
+            "type": "link",
+            "name": "Link",
+            "settings": [
+                {
+                    "type": "text",
+                    "id": "link_title",
+                    "label": "Link label",
+                    "default": "Shop all"
+                },
+                {
+                    "type": "url",
+                    "id": "link",
+                    "label": "Link"
+                },
+                {
+                    "type": "select",
+                    "id": "link_style",
+                    "label": "Link style",
+                    "options": [
+                        {
+                            "value": "link-body",
+                            "label": "Body text"
+                        },
+                        {
+                            "value": "link link--arrow",
+                            "label": "Chevron"
+                        },
+                        {
+                            "value": "c-btn c-btn--hollow",
+                            "label": "Outline button"
+                        },
+                        {
+                            "value": "c-btn c-btn--primary",
+                            "label": "Solid button"
+                        }
+                    ],
+                    "default": "c-btn c-btn--hollow"
+                }
+            ]
+        }
+    ],
+    "presets": [
+        {
+            "name": "Image and text banner",
+            "blocks": [
+                {
+                    "type": "text",
+                    "settings": {
+                        "text_size": 6,
+                        "text_width": 65,
+                        "text_size_mobile": 3
+                    }
+                },
+                {
+                    "type": "link"
+                }
+            ]
+        }
+    ],
+    "enabled_on": {
+        "templates": ["*"],
+        "groups": ["header", "footer"]
+    }
+}
+{% endschema %}

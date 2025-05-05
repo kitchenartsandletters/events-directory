@@ -1,0 +1,54 @@
+{% comment %}
+    Renders product label
+
+    Accepts:
+    - product: {Object} Product
+    - id: {String} Unique label id
+    - color: {Color} Color of the label
+    - type: {String} Label type: currency / percentage / text
+    - component: {String} Component main class
+
+    Usage:
+    {% render 'product-label',
+        product: product,
+        color: block.settings.label_color,
+        type: 'currency',
+        component: 'product-single'
+    %}
+
+    !!! NOTE: When changing this element, update the HTML in
+    VariantSelects.renderProductInfo()
+{% endcomment %}
+
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+
+  assign label_brightness = color | color_brightness
+  assign contrast_point = 125
+
+  if label_brightness < contrast_point
+    assign text_color = '#FFFFFF'
+  else
+    assign text_color = '#000000'
+  endif
+-%}
+
+<div id="{{ id }}" style="--background-color: {{ color }}; --text-color: {{ text_color }}" data-type="{{ type }}">
+  {%- if current_variant.compare_at_price > current_variant.price -%}
+    {%- liquid
+      case type:
+        when 'currency':
+          assign discount_format_currency = current_variant.compare_at_price | minus: current_variant.price | round | money
+          assign text = 'products.product_labels.discount_currency' | t: discount_format_currency: discount_format_currency
+        when 'percentage':
+          assign discount_format_percentage = current_variant.compare_at_price | minus: current_variant.price | times: 100.0 | divided_by: current_variant.compare_at_price | round
+          assign text = 'products.product_labels.discount_percentage' | t: discount_format_percentage: discount_format_percentage
+        when 'text':
+          assign text = 'products.product_labels.discount_text' | t
+      endcase
+    -%}
+    <div class="label">
+      <div class="label__text">{{ text }}</div>
+    </div>
+  {%- endif -%}
+</div>

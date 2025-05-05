@@ -1,0 +1,117 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "name": "Footer group",
+  "type": "footer",
+  "sections": {
+    "85404a16-eaed-4c78-b12e-6e911410ab8d": {
+      "type": "section-map",
+      "blocks": {
+        "sections--14594138570885__85404a16-eaed-4c78-b12e-6e911410ab8d-1688852136411d4557-0": {
+          "type": "map",
+          "settings": {
+            "title": "Our Location",
+            "desc": "<p><strong>1435 Lexington Avenue<br/>New York, NY 10128<br/>(212) 876-5550<br/>letters@kitchenartsandletters.com</strong></p><p><strong>Monday - Saturday 10:00 to 6:00<br/>Closed on Sundays</strong></p>",
+            "sub_desc": "",
+            "address": "1435 Lexington Avenue New York, NY 10128",
+            "map_image": "shopify://shop_images/starredmap.png"
+          }
+        }
+      },
+      "block_order": [
+        "sections--14594138570885__85404a16-eaed-4c78-b12e-6e911410ab8d-1688852136411d4557-0"
+      ],
+      "custom_css": [
+        ".home-map__media {max-height: 300px; /* Adjust the max-height as needed */ overflow: hidden;}",
+        ".home-map__item-wrap {padding-left: 30px;}",
+        ".home-map__title {padding-left: 30px;}"
+      ],
+      "settings": {
+        "show_directions_btn": true,
+        "bg_color": "rgba(0,0,0,0)",
+        "section-bottom-margin": true,
+        "google_api_key": "",
+        "map_style": "default"
+      }
+    },
+    "footer-newsletter": {
+      "type": "section-newsletter",
+      "settings": {
+        "divider": false,
+        "section-bottom-margin": true,
+        "section_width": "large",
+        "newsletter_bg": "#f2f2f2",
+        "newsletter_style": "dark",
+        "default_title_color": false,
+        "text_border_color": true,
+        "section_newsletter_title": "Stay Current with Our Newsletter",
+        "section_newsletter_desc": "<p><strong>10% Off Your First Order</strong></p><p>When you join our mailing list to learn about new releases, special offers, and great events.</p>"
+      }
+    },
+    "footer": {
+      "type": "footer",
+      "blocks": {
+        "eb0e5126-e13f-4c25-8103-c5af23e0980c": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/IMG_5126.jpg",
+            "image_width": 400,
+            "link": ""
+          }
+        },
+        "4471e50e-c157-46b7-ba5e-464266db8052": {
+          "type": "contact",
+          "settings": {
+            "title": "Contact",
+            "show_email": true,
+            "show_number": true,
+            "show_address": true,
+            "show_social": true,
+            "show_follow_on_shop": false
+          }
+        },
+        "b96dcb38-c4f5-4701-a393-c492aabf73f0": {
+          "type": "text",
+          "settings": {
+            "title": "Directions and Hours",
+            "text": "<p>The store is located on Lexington Avenue, between 93rd and 94th Streets. You can take the 6 train to 96th Street, or the 4 or 5 trains to 86th Street. Also, the Q train stops at 96th Street and Second Avenue.</p><p><strong>We are open Monday to Saturday from 10-6.</strong></p>"
+          }
+        },
+        "89d0fa1c-c677-480a-8f68-0064277b6320": {
+          "type": "text",
+          "settings": {
+            "title": "Policies",
+            "text": "<p><a href=\"/policies/shipping-policy\" title=\"Shipping Policy\">Shipping FAQs</a></p><p><a href=\"/policies/privacy-policy\" title=\"Privacy Policy\">Privacy Policy</a></p><p><a href=\"/policies/terms-of-service\" title=\"Terms of Service\">Terms of Service</a></p><p><a href=\"/policies/refund-policy\" title=\"Refund Policy\">Refunds, Returns & Exchanges</a></p><p><a href=\"https://www.kitchenartsandletters.com/pages/accessibility-statement\" target=\"_blank\" title=\"Kitchen Arts & Letters Accessibility Statement\">Accessibility</a></p>"
+          }
+        }
+      },
+      "block_order": [
+        "eb0e5126-e13f-4c25-8103-c5af23e0980c",
+        "4471e50e-c157-46b7-ba5e-464266db8052",
+        "b96dcb38-c4f5-4701-a393-c492aabf73f0",
+        "89d0fa1c-c677-480a-8f68-0064277b6320"
+      ],
+      "settings": {
+        "footer_bg": "rgba(0,0,0,0)",
+        "footer_style": "dark",
+        "footer_heading_color": false,
+        "show_payment_icons": false,
+        "divider": true,
+        "enable_country_selector": false,
+        "enable_language_selector": false
+      }
+    }
+  },
+  "order": [
+    "85404a16-eaed-4c78-b12e-6e911410ab8d",
+    "footer-newsletter",
+    "footer"
+  ]
+}

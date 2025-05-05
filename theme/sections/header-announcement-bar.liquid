@@ -1,0 +1,1441 @@
+{%- liquid
+  assign icon_size--desktop = section.settings.text_size_desktop | times: 0.1 | plus: 1.2
+  assign icon_size--mobile = section.settings.text_size_mobile | times: 0.1 | plus: 1.2
+-%}
+
+{%- if section.settings.home_page_only == false or template.name == 'index' -%}
+
+  {%- if section.blocks.size > 0 -%}
+    <style type="text/css">
+      .announcement__wrapper {
+        background-color: {{ section.settings.message_color_bg }};
+      }
+      .announcement__text,
+      .announcement__text a {
+        color: {{ section.settings.message_color_text }};
+        font-size: {{ section.settings.text_size_desktop | times: 0.1 | plus: 0.75 }}rem;
+      }
+      .announcement__text.rte a {
+        border-color: {{ section.settings.message_color_text }};
+      }
+      .announcement__icon {
+        width: {{ icon_size--desktop }}rem;
+        height: {{ icon_size--desktop }}rem;
+        color: {{ section.settings.message_color_text }};
+      }
+      .announcement__carousel-button,
+      .announcement__close {
+        color: {{ section.settings.message_color_text }};
+      }
+
+      @media screen and (max-width: 767px) {
+        .announcement__text,
+        .announcement__text a {
+          font-size: {{ section.settings.text_size_mobile | times: 0.1 | plus: 0.75 }}rem;
+        }
+
+        .announcement__icon {
+          width: {{ icon_size--mobile }}rem;
+          height: {{ icon_size--mobile }}rem;
+        }
+      }
+    </style>
+
+    <announcement-bar
+      id="{{ section.id }}"
+      {% if section.settings.close_icon %}dismissable{% endif %}
+      {%- if section.settings.auto_carousel -%}
+      autoplay="{{ section.settings.auto_carousel }}"
+      autoplay-delay="{{ section.settings.carousel_speed }}000"
+      {%- endif -%}
+    >
+
+      <div class="announcement__wrapper">
+        <div class="announcement__carousel-container">
+          <ol class="announcement__carousel-wrapper">
+
+          {%- for block in section.blocks -%}
+            {%- case block.type -%}
+
+              {%- when 'announcement' -%}
+              <li id="{{ block.id }}"
+                class="{{ block.type }} announcement__carousel-slides"
+                aria-label="{{ forloop.index }}/{{ forloop.length }}"
+                data-slide-id="{{ forloop.index }}"
+                {{ block.shopify_attributes }}
+              >
+                {%- if block.settings.text != blank -%}
+                  <div class="announcement__message">
+
+                    {%- if block.settings.link != blank -%}
+                      {%- if block.settings.text_link == blank -%}
+                        <a href="{{ block.settings.link }}" class="announcement__link">
+                      {%- endif -%}
+                    {%- endif -%}
+
+
+                    <div class="announcement__text announcement__text--{{ section.settings.text_style }}">
+                      {% unless block.settings.icon == "none" %}
+                        <span class="announcement__icon block--{{ block.id }}">
+                          {%- if block.settings.svg-code != blank -%}
+                              {{ block.settings.svg-code | replace: ' width=', ' ' | replace: ' height=', ' ' }}                       
+                          {%  else %}
+                            {% render 'icons', icon: block.settings.icon, icon-color: section.settings.message_color_text, block-id: block.id %}
+                          {%- endif -%}
+                        </span>
+                      {% endunless %}
+                      <span>{{ block.settings.text | escape }}</span>
+                      {%- if block.settings.text_link != blank -%}
+                        <span><a href="{{ block.settings.link }}" class="announcement__link__text">{{ block.settings.text_link | escape }}</a></span>
+                      {%- endif -%}
+                    </div>
+
+                    {%- if block.settings.link != blank -%}
+                      {%- if block.settings.text_link == blank -%}
+                        </a>
+                      {%- endif -%}
+                    {%- endif -%}
+
+                  </div>
+                {%- endif -%}
+              </li>
+
+              {%- when 'announcement_pop-up' -%}
+              <li id="{{ block.id }}"
+                class="{{ block.type }} announcement__carousel-slides"
+                aria-label="{{ forloop.index }}/{{ forloop.length }}"
+                data-slide-id="{{ forloop.index }}"
+                {{ block.shopify_attributes }}
+              >
+
+              {%- if block.settings.text != blank -%}
+                {% unless block.settings.popup_content == blank and block.settings.popup_text_heading == blank and block.settings.image == blank and block.settings.image_link == blank and block.settings.popup_text == blank %}
+                <div class="announcement-popup-draw js-announcement-popup-draw-{{ block.id }} js-announcement-popup-draw mfp-hide">
+                  <div class="announcement-popup-draw__wrapper">
+
+                    {% unless block.settings.popup_text_heading == blank %}
+                      <div class="announcement-popup__head">
+                        <div class="announcement-popup__label">
+                          <h3 class="announcement-popup__label-title h4">{{ block.settings.popup_text_heading }}</h3>
+                        </div>
+                      </div>
+                    {% endunless %}
+
+                    <div class="announcement-popup__inner rte">
+                      {% if block.settings.image != blank or block.settings.popup_text != blank %}
+                        {% if block.settings.image != blank %}
+                          {%- if block.settings.image_link != blank -%}
+                          <a href="{{ block.settings.image_link }}" class="announcement__link">
+                          {%- endif -%}
+                          <div class="announcement-popup__image">
+                            <img
+                              class="announcement-popup__media-img"
+                              src="{{ block.settings.image | image_url: width: 300 }}"
+                              srcset="
+                                {{ block.settings.image | image_url: width: 180 }} 180w {{ 180 | divided_by: block.settings.image.aspect_ratio | round }}h,
+                                {{ block.settings.image | image_url: width: 360 }} 360w {{ 360 | divided_by: block.settings.image.aspect_ratio | round }}h,
+                                {{ block.settings.image | image_url: width: 540 }} 540w {{ 540 | divided_by: block.settings.image.aspect_ratio | round }}h,
+                                {{ block.settings.image | image_url: width: 720 }} 720w {{ 720 | divided_by: block.settings.image.aspect_ratio | round }}h,
+                                {{ block.settings.image | image_url: width: 900 }} 900w {{ 900 | divided_by: block.settings.image.aspect_ratio | round }}h,
+                                {{ block.settings.image | image_url: width: 1080 }} 1080w {{ 1080 | divided_by: block.settings.image.aspect_ratio | round }}h,
+                                {{ block.settings.image | image_url: width: 1296 }} 1296w {{ 1296 | divided_by: block.settings.image.aspect_ratio | round }}h,
+                                {{ block.settings.image | image_url: width: 1512 }} 1512w {{ 1512 | divided_by: block.settings.image.aspect_ratio | round }}h
+                              "
+                              sizes="(min-width: 700px) 640px, 100vw"
+                              width="300"
+                              height="{{ 300 | divided_by: block.settings.image.aspect_ratio | round }}"
+                              alt="{{ block.settings.image.alt | escape }}"
+                              loading="lazy"
+                            />
+                          </div>
+                          {%- if block.settings.image_link != blank -%}
+                          </a>
+                          {%- endif -%}
+                        {% endif %}
+                        {% if block.settings.popup_text != blank %}
+                          <div class="announcement-popup__text{% if block.settings.image != blank %} announcement-popup__text--margin{% endif %} rte">{{ block.settings.popup_text }}</div>
+                        {% endif %}
+
+                      {% else %}
+                        {{ pages[block.settings.popup_content].content }}
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+                {% endunless %}
+
+                <div class="announcement__message">
+
+                  {%- if block.settings.text_link == blank -%}
+                    <a href="{{ block.settings.popup_content.url }}" class="announcement__link js-announcement-popup-trigger" data-popup-id="{{ block.id }}">
+                  {%- endif -%}
+
+                  <div class="announcement__text announcement__text--{{ section.settings.text_style }}">
+                    {% unless block.settings.icon == "none" %}
+                      <span class="announcement__icon block--{{ block.id }}">
+                      {%- if block.settings.svg-code != blank -%}
+                        {{ block.settings.svg-code | replace: ' width=', ' ' | replace: ' height=', ' ' }}                       
+                      {%-  else -%}
+                        {% render 'icons', icon: block.settings.icon, icon-color: section.settings.message_color_text, block-id: block.id %}
+                      {%- endif -%}
+                      </span>
+                    {% endunless %}
+
+                    <span>{{ block.settings.text | escape }}</span>
+
+                    {%- if block.settings.text_link != blank -%}
+                      <span><a href="{{ block.settings.popup_content.url }}" class="announcement__link__text js-announcement-popup-trigger" data-popup-id="{{ block.id }}">{{ block.settings.text_link | escape }}</a></span>
+                    {%- endif -%}
+                  </div>
+
+                  {%- if block.settings.text_link == blank -%}
+                      </a>
+                  {%- endif -%}
+                </div>
+
+              {%- endif -%}
+              </li>
+            {%- endcase -%}
+          {%- endfor -%}
+
+          </ol>
+        </div>
+      </div>
+
+    </announcement-bar>
+
+    {% unless request.design_mode %}
+      <script>
+        const sectionId = `{{ section.id }}`;
+        const announcementBar = document.getElementById(sectionId);
+        if (sessionStorage.getItem(sectionId) === '0') {
+          announcementBar.setAttribute('hidden', 'hidden');
+        }
+      </script>
+    {% endunless %}
+
+    <script src="{{ 'announcement-bar.js' | asset_url }}" type="module"></script>
+
+  {%- endif -%}
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Announcement bar",
+  "class": "js-section__announcement",
+  "max_blocks": 5,
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "home_page_only",
+      "label": "Home page only",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "text_size_desktop",
+      "label": "Text size (desktop)",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "text_size_mobile",
+      "label": "Text size (mobile)",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "default": 1
+    },
+    {
+      "type": "select",
+      "id": "text_style",
+      "label": "Font style",
+      "options": [
+        {
+          "value": "body",
+          "label": "Body"
+        },
+        {
+          "value": "heading",
+          "label": "Heading"
+        }
+      ],
+      "default": "body"
+    },
+    {
+      "type": "color",
+      "id": "message_color_bg",
+      "label": "Background color",
+      "default": "#212121"
+    },
+    {
+      "type": "color",
+      "id": "message_color_text",
+      "label": "Text color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Visibility"
+    },
+    {
+      "type": "checkbox",
+      "id": "close_icon",
+      "label": "Show close icon",
+      "info": "The close function is disabled inside the theme editor but will work as expected on your live store.",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Carousel",
+      "info": "Multiple announcement blocks are required to enable the carousel."
+    },
+    {
+      "type": "checkbox",
+      "id": "auto_carousel",
+      "label": "Auto rotate carousel",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "carousel_speed",
+      "label": "Change announcement every",
+      "unit": "sec",
+      "min": 5,
+      "max": 10,
+      "step": 1,
+      "default": 8
+    }
+  ],
+  "blocks": [
+    {
+      "type": "announcement",
+      "name": "Announcement",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "default": "icon-megaphone",
+          "options": [
+            {
+              "value": "none",
+              "label": "none"
+            },
+            {
+              "group": "Commerce",
+              "value": "icon-crypto-currency-bitcoin-circle",
+              "label": "bitcoin in circle"
+            },
+            {
+              "group": "Commerce",
+              "value": "icon-accounting-coins-stack",
+              "label": "coin stack"
+            },
+            {
+              "group": "Commerce",
+              "value": "icon-credit-card",
+              "label": "credit cards"
+            },
+            {
+              "group": "Commerce",
+              "value": "icon-discount-circle",
+              "label": "discount in circle"
+            },
+            {
+              "group": "Commerce",
+              "value": "icon-currency-dollar-circle",
+              "label": "dollar in circle"
+            },
+            {
+              "group": "Commerce",
+              "value": "icon-currency-euro-circle",
+              "label": "euro in circle"
+            },
+            {
+              "group": "Commerce",
+              "value": "icon-gift-box",
+              "label": "gift box"
+            },
+            {
+              "group": "Commerce",
+              "value": "icon-saving-piggy-bank",
+              "label": "piggy-bank"
+            },
+            {
+              "group": "Commerce",
+              "value": "icon-currency-pound-circle",
+              "label": "pound in circle"
+            },
+            {
+              "group": "Commerce",
+              "value": "icon-shopping-bag",
+              "label": "shopping bag"
+            },
+            {
+              "group": "Commerce",
+              "value": "icon-shopping-basket",
+              "label": "shopping basket"
+            },
+            {
+              "group": "Commerce",
+              "value": "icon-shopping-cart-empty-1",
+              "label": "shopping cart"
+            },
+            {
+              "group": "Commerce",
+              "value": "icon-tags-1",
+              "label": "shopping label"
+            },
+            {
+              "group": "Commerce",
+              "value": "icon-shop",
+              "label": "store"
+            },
+            {
+              "group": "Commerce",
+              "value": "icon-currency-yuan-circle",
+              "label": "yuan in circle"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-conversation-chat-text",
+              "label": "chat"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-headphones-customer-support",
+              "label": "customer support"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-read-email-at",
+              "label": "email symbol"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-envelope",
+              "label": "envelope"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-social-media-facebook",
+              "label": "facebook"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-social-instagram",
+              "label": "instagram"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-light-bulb-shine",
+              "label": "lightbulb"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-like-1",
+              "label": "like"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-professional-network-linkedin",
+              "label": "linkedin"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-love-it",
+              "label": "love"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-megaphone",
+              "label": "megaphone"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-alarm-bell-1",
+              "label": "notification bell"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-question-circle",
+              "label": "question in circle"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-send-email",
+              "label": "send"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-mobile-phone",
+              "label": "telephone"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-social-media-tiktok",
+              "label": "tiktok"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-social-media-twitter",
+              "label": "twitter"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-video-player",
+              "label": "video"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-fruit-apple",
+              "label": "apple"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-flying-insect-bee-4",
+              "label": "bee"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-fast-food-double-burger",
+              "label": "burger"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-vegetables-carrot",
+              "label": "carrot"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-champagne-cheers",
+              "label": "champagne glasses"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-cocktail-martini",
+              "label": "cocktail glass"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-coffee-cup",
+              "label": "cup"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-donut",
+              "label": "doughnut"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-pasta-bowl-warm",
+              "label": "food bowl"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-ice-cream-stick",
+              "label": "ice cream"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-ecology-leaf",
+              "label": "leaf"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-organic-plant-grow-1",
+              "label": "plant"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-asian-food-rice",
+              "label": "rice bowl"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-rooster",
+              "label": "rooster"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-seafood-fish",
+              "label": "seafood"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-barbecue-steak",
+              "label": "steak"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-fruit-watermelon",
+              "label": "watermelon"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-farming-wheat",
+              "label": "wheat"
+            },
+            {
+              "group": "General",
+              "value": "icon-matches-fire",
+              "label": "fire"
+            },
+            {
+              "group": "General",
+              "value": "icon-flash",
+              "label": "lightning"
+            },
+            {
+              "group": "General",
+              "value": "icon-maps-pin-1",
+              "label": "map"
+            },
+            {
+              "group": "General",
+              "value": "icon-pin",
+              "label": "map pin"
+            },
+            {
+              "group": "General",
+              "value": "icon-navigation-menu",
+              "label": "navigation menu"
+            },
+            {
+              "group": "General",
+              "value": "icon-search-1",
+              "label": "search icon"
+            },
+            {
+              "group": "General",
+              "value": "icon-single-neutral",
+              "label": "user icon"
+            },
+            {
+              "group": "Product",
+              "value": "icon-book-close",
+              "label": "book"
+            },
+            {
+              "group": "Product",
+              "value": "icon-camera-1",
+              "label": "camera"
+            },
+            {
+              "group": "Product",
+              "value": "icon-diamond",
+              "label": "diamond"
+            },
+            {
+              "group": "Product",
+              "value": "icon-download-bottom",
+              "label": "download"
+            },
+            {
+              "group": "Product",
+              "value": "icon-tank-top-female-2",
+              "label": "female shirt"
+            },
+            {
+              "group": "Product",
+              "value": "icon-footwear-heels-1",
+              "label": "footwear heels"
+            },
+            {
+              "group": "Product",
+              "value": "icon-footwear-sneakers",
+              "label": "footwear sneakers"
+            },
+            {
+              "group": "Product",
+              "value": "icon-headphones",
+              "label": "headphones"
+            },
+            {
+              "group": "Product",
+              "value": "icon-picture-stack-landscape",
+              "label": "images"
+            },
+            {
+              "group": "Product",
+              "value": "icon-laundry-retro-iron",
+              "label": "iron"
+            },
+            {
+              "group": "Product",
+              "value": "icon-hospital-first-aid",
+              "label": "medical"
+            },
+            {
+              "group": "Product",
+              "value": "icon-notes-list",
+              "label": "notes"
+            },
+            {
+              "group": "Product",
+              "value": "icon-color-painting-palette",
+              "label": "palette"
+            },
+            {
+              "group": "Product",
+              "value": "icon-pencil-2",
+              "label": "pencil"
+            },
+            {
+              "group": "Product",
+              "value": "icon-pill",
+              "label": "pill"
+            },
+            {
+              "group": "Product",
+              "value": "icon-recycling-sign",
+              "label": "recycling"
+            },
+            {
+              "group": "Product",
+              "value": "icon-ruler",
+              "label": "ruler"
+            },
+            {
+              "group": "Product",
+              "value": "icon-clothes-design-sewing-machine",
+              "label": "sewing machine"
+            },
+            {
+              "group": "Product",
+              "value": "icon-shirt",
+              "label": "shirt"
+            },
+            {
+              "group": "Product",
+              "value": "icon-fitness-jumping-rope",
+              "label": "skipping rope"
+            },
+            {
+              "group": "Product",
+              "value": "icon-ice-snowflake",
+              "label": "snowflake"
+            },
+            {
+              "group": "Product",
+              "value": "icon-glasses-retro",
+              "label": "spectacles"
+            },
+            {
+              "group": "Product",
+              "value": "icon-clothes-design-tape-measure",
+              "label": "tape measure"
+            },
+            {
+              "group": "Product",
+              "value": "icon-task-list-to-do",
+              "label": "to do list"
+            },
+            {
+              "group": "Product",
+              "value": "icon-hammer-wrench",
+              "label": "tools"
+            },
+            {
+              "group": "Product",
+              "value": "icon-trousers-calves-2",
+              "label": "trousers"
+            },
+            {
+              "group": "Product",
+              "value": "icon-laundry-machine-2",
+              "label": "washing machine"
+            },
+            {
+              "group": "Shipping",
+              "value": "icon-calendar-date",
+              "label": "calendar"
+            },
+            {
+              "group": "Shipping",
+              "value": "icon-delivery-truck-3",
+              "label": "delivery truck"
+            },
+            {
+              "group": "Shipping",
+              "value": "icon-shipment-give",
+              "label": "hand shipment"
+            },
+            {
+              "group": "Shipping",
+              "value": "icon-shipment-package",
+              "label": "package shipment"
+            },
+            {
+              "group": "Shipping",
+              "value": "icon-keyboard-arrow-return",
+              "label": "return"
+            },
+            {
+              "group": "Shipping",
+              "value": "icon-sea-transport-boat",
+              "label": "shipping"
+            },
+            {
+              "group": "Shipping",
+              "value": "icon-stopwatch",
+              "label": "stopwatch"
+            },
+            {
+              "group": "Shipping",
+              "value": "icon-warehouse-cart-package-ribbon-1",
+              "label": "warehouse package"
+            },
+            {
+              "group": "Trust",
+              "value": "icon-award-medal",
+              "label": "award medal"
+            },
+            {
+              "group": "Trust",
+              "value": "icon-award-ribbon-star-1",
+              "label": "award ribbon"
+            },
+            {
+              "group": "Trust",
+              "value": "icon-award-trophy-star-1",
+              "label": "award trophy"
+            },
+            {
+              "group": "Trust",
+              "value": "icon-check-circle-1",
+              "label": "checkmark in circle"
+            },
+            {
+              "group": "Trust",
+              "value": "icon-shield-check",
+              "label": "checkmark in shield"
+            },
+            {
+              "group": "Trust",
+              "value": "icon-flag",
+              "label": "flag"
+            },
+            {
+              "group": "Trust",
+              "value": "icon-single-neutral-id-card-3",
+              "label": "ID card"
+            },
+            {
+              "group": "Trust",
+              "value": "icon-lock-2",
+              "label": "lock"
+            }
+          ]
+        },
+        {
+          "type": "html",
+          "id": "svg-code",
+          "label": "SVG icon code",
+          "info": "Learn more about adding your own SVG icons [here](https://support.safeasmilk.co/article/236-general-add-custom-svg-icons-to-your-theme)."
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "Make an announcement here"
+        },
+        {
+          "type": "text",
+          "id": "text_link",
+          "label": "Link label",
+          "info": "Leave this field blank to turn the whole announcement text into the link."
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    },
+    {
+      "type": "announcement_pop-up",
+      "name": "Announcement with pop-up",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "default": "icon-megaphone",
+          "options": [
+            {
+              "value": "none",
+              "label": "none"
+            },
+            {
+              "group": "Commerce",
+              "value": "icon-crypto-currency-bitcoin-circle",
+              "label": "bitcoin in circle"
+            },
+            {
+              "group": "Commerce",
+              "value": "icon-accounting-coins-stack",
+              "label": "coin stack"
+            },
+            {
+              "group": "Commerce",
+              "value": "icon-credit-card",
+              "label": "credit cards"
+            },
+            {
+              "group": "Commerce",
+              "value": "icon-discount-circle",
+              "label": "discount in circle"
+            },
+            {
+              "group": "Commerce",
+              "value": "icon-currency-dollar-circle",
+              "label": "dollar in circle"
+            },
+            {
+              "group": "Commerce",
+              "value": "icon-currency-euro-circle",
+              "label": "euro in circle"
+            },
+            {
+              "group": "Commerce",
+              "value": "icon-gift-box",
+              "label": "gift box"
+            },
+            {
+              "group": "Commerce",
+              "value": "icon-saving-piggy-bank",
+              "label": "piggy-bank"
+            },
+            {
+              "group": "Commerce",
+              "value": "icon-currency-pound-circle",
+              "label": "pound in circle"
+            },
+            {
+              "group": "Commerce",
+              "value": "icon-shopping-bag",
+              "label": "shopping bag"
+            },
+            {
+              "group": "Commerce",
+              "value": "icon-shopping-basket",
+              "label": "shopping basket"
+            },
+            {
+              "group": "Commerce",
+              "value": "icon-shopping-cart-empty-1",
+              "label": "shopping cart"
+            },
+            {
+              "group": "Commerce",
+              "value": "icon-tags-1",
+              "label": "shopping label"
+            },
+            {
+              "group": "Commerce",
+              "value": "icon-shop",
+              "label": "store"
+            },
+            {
+              "group": "Commerce",
+              "value": "icon-currency-yuan-circle",
+              "label": "yuan in circle"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-conversation-chat-text",
+              "label": "chat"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-headphones-customer-support",
+              "label": "customer support"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-read-email-at",
+              "label": "email symbol"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-envelope",
+              "label": "envelope"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-social-media-facebook",
+              "label": "facebook"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-social-instagram",
+              "label": "instagram"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-light-bulb-shine",
+              "label": "lightbulb"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-like-1",
+              "label": "like"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-professional-network-linkedin",
+              "label": "linkedin"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-love-it",
+              "label": "love"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-megaphone",
+              "label": "megaphone"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-alarm-bell-1",
+              "label": "notification bell"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-question-circle",
+              "label": "question in circle"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-send-email",
+              "label": "send"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-mobile-phone",
+              "label": "telephone"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-social-media-tiktok",
+              "label": "tiktok"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-social-media-twitter",
+              "label": "twitter"
+            },
+            {
+              "group": "Communication",
+              "value": "icon-video-player",
+              "label": "video"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-fruit-apple",
+              "label": "apple"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-flying-insect-bee-4",
+              "label": "bee"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-fast-food-double-burger",
+              "label": "burger"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-vegetables-carrot",
+              "label": "carrot"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-champagne-cheers",
+              "label": "champagne glasses"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-cocktail-martini",
+              "label": "cocktail glass"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-coffee-cup",
+              "label": "cup"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-donut",
+              "label": "doughnut"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-pasta-bowl-warm",
+              "label": "food bowl"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-ice-cream-stick",
+              "label": "ice cream"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-ecology-leaf",
+              "label": "leaf"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-organic-plant-grow-1",
+              "label": "plant"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-asian-food-rice",
+              "label": "rice bowl"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-rooster",
+              "label": "rooster"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-seafood-fish",
+              "label": "seafood"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-barbecue-steak",
+              "label": "steak"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-fruit-watermelon",
+              "label": "watermelon"
+            },
+            {
+              "group": "Food and Drink",
+              "value": "icon-farming-wheat",
+              "label": "wheat"
+            },
+            {
+              "group": "General",
+              "value": "icon-matches-fire",
+              "label": "fire"
+            },
+            {
+              "group": "General",
+              "value": "icon-flash",
+              "label": "lightning"
+            },
+            {
+              "group": "General",
+              "value": "icon-maps-pin-1",
+              "label": "map"
+            },
+            {
+              "group": "General",
+              "value": "icon-pin",
+              "label": "map pin"
+            },
+            {
+              "group": "General",
+              "value": "icon-navigation-menu",
+              "label": "navigation menu"
+            },
+            {
+              "group": "General",
+              "value": "icon-search-1",
+              "label": "search icon"
+            },
+            {
+              "group": "General",
+              "value": "icon-single-neutral",
+              "label": "user icon"
+            },
+            {
+              "group": "Product",
+              "value": "icon-book-close",
+              "label": "book"
+            },
+            {
+              "group": "Product",
+              "value": "icon-camera-1",
+              "label": "camera"
+            },
+            {
+              "group": "Product",
+              "value": "icon-diamond",
+              "label": "diamond"
+            },
+            {
+              "group": "Product",
+              "value": "icon-download-bottom",
+              "label": "download"
+            },
+            {
+              "group": "Product",
+              "value": "icon-tank-top-female-2",
+              "label": "female shirt"
+            },
+            {
+              "group": "Product",
+              "value": "icon-footwear-heels-1",
+              "label": "footwear heels"
+            },
+            {
+              "group": "Product",
+              "value": "icon-footwear-sneakers",
+              "label": "footwear sneakers"
+            },
+            {
+              "group": "Product",
+              "value": "icon-headphones",
+              "label": "headphones"
+            },
+            {
+              "group": "Product",
+              "value": "icon-picture-stack-landscape",
+              "label": "images"
+            },
+            {
+              "group": "Product",
+              "value": "icon-laundry-retro-iron",
+              "label": "iron"
+            },
+            {
+              "group": "Product",
+              "value": "icon-hospital-first-aid",
+              "label": "medical"
+            },
+            {
+              "group": "Product",
+              "value": "icon-notes-list",
+              "label": "notes"
+            },
+            {
+              "group": "Product",
+              "value": "icon-color-painting-palette",
+              "label": "palette"
+            },
+            {
+              "group": "Product",
+              "value": "icon-pencil-2",
+              "label": "pencil"
+            },
+            {
+              "group": "Product",
+              "value": "icon-pill",
+              "label": "pill"
+            },
+            {
+              "group": "Product",
+              "value": "icon-recycling-sign",
+              "label": "recycling"
+            },
+            {
+              "group": "Product",
+              "value": "icon-ruler",
+              "label": "ruler"
+            },
+            {
+              "group": "Product",
+              "value": "icon-clothes-design-sewing-machine",
+              "label": "sewing machine"
+            },
+            {
+              "group": "Product",
+              "value": "icon-shirt",
+              "label": "shirt"
+            },
+            {
+              "group": "Product",
+              "value": "icon-fitness-jumping-rope",
+              "label": "skipping rope"
+            },
+            {
+              "group": "Product",
+              "value": "icon-ice-snowflake",
+              "label": "snowflake"
+            },
+            {
+              "group": "Product",
+              "value": "icon-glasses-retro",
+              "label": "spectacles"
+            },
+            {
+              "group": "Product",
+              "value": "icon-clothes-design-tape-measure",
+              "label": "tape measure"
+            },
+            {
+              "group": "Product",
+              "value": "icon-task-list-to-do",
+              "label": "to do list"
+            },
+            {
+              "group": "Product",
+              "value": "icon-hammer-wrench",
+              "label": "tools"
+            },
+            {
+              "group": "Product",
+              "value": "icon-trousers-calves-2",
+              "label": "trousers"
+            },
+            {
+              "group": "Product",
+              "value": "icon-laundry-machine-2",
+              "label": "washing machine"
+            },
+            {
+              "group": "Shipping",
+              "value": "icon-calendar-date",
+              "label": "calendar"
+            },
+            {
+              "group": "Shipping",
+              "value": "icon-delivery-truck-3",
+              "label": "delivery truck"
+            },
+            {
+              "group": "Shipping",
+              "value": "icon-shipment-give",
+              "label": "hand shipment"
+            },
+            {
+              "group": "Shipping",
+              "value": "icon-shipment-package",
+              "label": "package shipment"
+            },
+            {
+              "group": "Shipping",
+              "value": "icon-keyboard-arrow-return",
+              "label": "return"
+            },
+            {
+              "group": "Shipping",
+              "value": "icon-sea-transport-boat",
+              "label": "shipping"
+            },
+            {
+              "group": "Shipping",
+              "value": "icon-stopwatch",
+              "label": "stopwatch"
+            },
+            {
+              "group": "Shipping",
+              "value": "icon-warehouse-cart-package-ribbon-1",
+              "label": "warehouse package"
+            },
+            {
+              "group": "Trust",
+              "value": "icon-award-medal",
+              "label": "award medal"
+            },
+            {
+              "group": "Trust",
+              "value": "icon-award-ribbon-star-1",
+              "label": "award ribbon"
+            },
+            {
+              "group": "Trust",
+              "value": "icon-award-trophy-star-1",
+              "label": "award trophy"
+            },
+            {
+              "group": "Trust",
+              "value": "icon-check-circle-1",
+              "label": "checkmark in circle"
+            },
+            {
+              "group": "Trust",
+              "value": "icon-shield-check",
+              "label": "checkmark in shield"
+            },
+            {
+              "group": "Trust",
+              "value": "icon-flag",
+              "label": "flag"
+            },
+            {
+              "group": "Trust",
+              "value": "icon-single-neutral-id-card-3",
+              "label": "ID card"
+            },
+            {
+              "group": "Trust",
+              "value": "icon-lock-2",
+              "label": "lock"
+            }
+          ]
+        },
+        {
+          "type": "html",
+          "id": "svg-code",
+          "label": "SVG icon code",
+          "info": "Learn more about adding your own SVG icons [here](https://support.safeasmilk.co/article/236-general-add-custom-svg-icons-to-your-theme)."
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "Store updates and announcements"
+        },
+        {
+          "type": "text",
+          "id": "text_link",
+          "label": "Pop-up link label",
+          "info": "Leave this field blank to turn the whole announcement text into the pop-up link."
+        },
+        {
+          "type": "header",
+          "content": "Pop-up Content"
+        },
+        {
+          "type": "page",
+          "id": "popup_content",
+          "label": "Page"
+        },
+        {
+          "type": "text",
+          "id": "popup_text_heading",
+          "label": "Pop-up heading"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "url",
+          "id": "image_link",
+          "label": "Image Link"
+        },
+        {
+          "type": "richtext",
+          "id": "popup_text",
+          "label": "Text",
+          "info": "Any image or text added here will replace the selected page content"
+        }
+      ]
+    }
+  ],
+  "default": {
+    "settings": {},
+    "blocks": [
+      {
+        "type": "announcement"
+      }
+    ]
+  }
+}
+{% endschema %}

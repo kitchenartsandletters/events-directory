@@ -1,0 +1,84 @@
+{% comment %}
+    Renders product page story block
+
+    Accepts:
+    - block: {Object}
+{% endcomment %}
+
+{%- liquid
+    if block.settings.column == 'primary'
+        assign sizes-column-width = '40vw'
+    else
+        assign sizes-column-width = '60vw'
+    endif
+-%}
+
+{%- capture image-sizes-desk -%}
+    {%- if block.settings.layout_desktop == 'desk-col-1' -%}
+        (min-width: 981px) calc({{ sizes-column-width }} - 30px), (min-width: 768px) 660px
+    {%- else -%}
+        (min-width: 981px) calc(0.2 * ({{ sizes-column-width }} - 30px)), (min-width: 768px) calc(0.2 * 660px)
+    {%- endif -%}
+{%- endcapture -%}
+
+{%- capture image-sizes-mob -%}
+    {%- if block.settings.layout_mobile == 'mob-col-1' -%}
+        calc(100vw - 36px)
+    {%- else -%} 
+        calc(20vw - 36px)
+    {%- endif -%}
+{%- endcapture -%}
+
+<div class="product-single__profile-container{% if block.settings.divider == true %} product-single__profile-container--divider{% endif %}{% if block.settings.image_toggle == true %} {{ block.settings.layout_desktop }} {{ block.settings.layout_mobile }}{% endif %}">
+
+    {% unless block.settings.image_toggle == false %}
+    <div class="product-single__profile-image">
+        <div class="o-ratio o-ratio--{{ block.settings.image_ratio }}"{% if block.settings.image_ratio == 'natural' %} style="padding-bottom:{{ 1 | divided_by: block.settings.image.aspect_ratio | times: 100 }}%;"{% endif %}>
+            <div class="o-ratio__content">
+                {% unless block.settings.image == blank %}
+                    <img
+                        class="product-single__media-img product-single__media-img--{% if block.settings.image_fit %}fit{% else %}crop{% endif %}"
+                        src="{{ block.settings.image | image_url: width: 360 }}"
+                        srcset="
+                            {{ block.settings.image | image_url: width: 180 }} 180w {{ 180 | divided_by: block.settings.image.aspect_ratio | round }}h,
+                            {{ block.settings.image | image_url: width: 360 }} 360w {{ 360 | divided_by: block.settings.image.aspect_ratio | round }}h,
+                            {{ block.settings.image | image_url: width: 540 }} 540w {{ 540 | divided_by: block.settings.image.aspect_ratio | round }}h,
+                            {{ block.settings.image | image_url: width: 720 }} 720w {{ 720 | divided_by: block.settings.image.aspect_ratio | round }}h,
+                            {{ block.settings.image | image_url: width: 900 }} 900w {{ 900 | divided_by: block.settings.image.aspect_ratio | round }}h,
+                            {{ block.settings.image | image_url: width: 1080 }} 1080w {{ 1080 | divided_by: block.settings.image.aspect_ratio | round }}h,
+                            {{ block.settings.image | image_url: width: 1296 }} 1296w {{ 1296 | divided_by: block.settings.image.aspect_ratio | round }}h,
+                            {{ block.settings.image | image_url: width: 1512 }} 1512w {{ 1512 | divided_by: block.settings.image.aspect_ratio | round }}h,
+                            {{ block.settings.image | image_url: width: 1728 }} 1728w {{ 1728 | divided_by: block.settings.image.aspect_ratio | round }}h,
+                            {{ block.settings.image | image_url: width: 2100 }} 2100w {{ 2100 | divided_by: block.settings.image.aspect_ratio | round }}h,
+                            {{ block.settings.image | image_url: width: 2260 }} 2260w {{ 2260 | divided_by: block.settings.image.aspect_ratio | round }}h
+                        "
+                        sizes="{{ image-sizes-desk }},{{ image-sizes-mob }}"
+                        width="360"
+                        height="{{ 360 | divided_by: block.settings.image.aspect_ratio | round }}"
+                        alt="{{ block.settings.image.alt | escape }}"
+                        loading="lazy"
+                        style="object-position:{{ block.settings.image.presentation.focal_point }}"
+                    />
+                {% else %}
+                    {{ 'image' | placeholder_svg_tag: 'placeholder-svg placeholder-svg--light' }}
+                {% endunless %}
+            </div>
+        </div>
+    </div>
+    {% endunless %}
+
+    <div class="product-single__profile-text{% if block.settings.image_toggle == true %} product-single__profile-text--margin-top{% endif %}">
+        {%- if block.settings.title != blank -%}
+            <h5 class="product-single__box__heading {{ block.settings.style }}">{{ block.settings.title | escape }}</h5>
+        {%- endif -%}
+        {%- if block.settings.text != blank -%}
+            <div class="product-single__box__text rte">{{ block.settings.text }}</div>
+        {%- endif -%}
+        {% if block.settings.link != blank %}
+            <div class="product-single__box__link">
+                <a href="{{ block.settings.link }}" class="{% if block.settings.link_style == "body" %}link--underline{% endif %}{% if block.settings.link_style == "chevron" %}link link--arrow{% endif %}">{{ block.settings.link_title }}</a>
+            </div>
+        {% endif %}
+    </div>
+
+</div>

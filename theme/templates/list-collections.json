@@ -1,0 +1,40 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-list-collections",
+      "settings": {
+        "display_type": "all",
+        "sort": "alphabetical",
+        "grid": 5,
+        "title_size": 2,
+        "image_ratio": "2:3",
+        "button_style": "c-btn c-btn--hollow",
+        "alignment": "middle-center",
+        "text_alignment": "center",
+        "visibility_heading": true,
+        "visibility_border": true,
+        "visibility_count": false,
+        "visibility_description": false,
+        "visibility_button": true,
+        "hover_options": "hover-button",
+        "color_text": "#ffffff",
+        "color_overlay": "#000000",
+        "color_overlay_strength": 60,
+        "color_default_heading": false,
+        "color_default_border": true
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

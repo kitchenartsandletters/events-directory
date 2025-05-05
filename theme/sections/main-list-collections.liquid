@@ -1,0 +1,545 @@
+{%- liquid
+
+    assign text_color_brightness = section.settings.color_text | color_brightness
+
+    assign sizes = '100vw'
+    assign grid = section.settings.grid
+    assign mobile_sizes = 'calc(100vw - 36px)'
+
+    case grid
+        when 2
+            assign sizes = '(min-width: 1600px) calc((80vw - 90px) / 2), (min-width: 981px) calc((100vw - 90px) / 2), (min-width: 768px) calc((100vw - 66px) / 2), ' | append: mobile_sizes
+        when 3
+            assign sizes = '(min-width: 1600px) calc((80vw - 120px) / 3), (min-width: 981px) calc((100vw - 120px) / 3), (min-width: 768px) calc((100vw - 66px) / 3), ' | append: mobile_sizes
+        when 4
+            assign sizes = '(min-width: 1600px) calc((80vw - 105px) / 4), (min-width: 1081px) calc((100vw - 105px) / 4), (min-width: 981px) calc((100vw - 90px) / 4), (min-width: 768px) calc((100vw - 51px) / 4), ' | append: mobile_sizes
+        when 5
+            assign sizes = '(min-width: 1600px) calc((80vw - 105px) / 5), (min-width: 1081px) calc((100vw - 105px) / 5), (min-width: 981px) calc((100vw - 90px) / 5), (min-width: 768px) calc((100vw - 51px) / 5), ' | append: mobile_sizes
+    endcase
+-%}
+<style>
+.section--{{ section.id }} .collection-list__bg:before,
+.section--{{ section.id }} .collection-list__overlay:before {
+    {% if section.settings.overlay_strength == 100 %}
+        opacity: 1;
+    {% else %}
+        opacity: .{{ section.settings.overlay_strength }};
+    {% endif %}
+}
+.section--{{ section.id }} .collection-list__content-heading,
+.section--{{ section.id }} .collection-list__content-count,
+.section--{{ section.id }} .collection-list__content-text,
+.section--{{ section.id }} .collection-list__content-link {
+    color: {{ section.settings.color_text }}
+}
+{% if section.settings.color_default_heading %}
+    .section--{{ section.id }} .collection-list__content-heading {
+      color: {{ settings.color_headings }};
+    }
+{% endif %}
+{% unless section.settings.color_default_border %}
+    body[data-heading-border=true] .section--{{ section.id }} .collection-list__content-heading:after {
+      background: {{ section.settings.color_text }};
+    }
+{% endunless %}
+.section--{{ section.id }} .collection-list__content-link.c-btn--hollow {
+    box-shadow: inset 0 0 0 1px {{ section.settings.color_text }};
+}
+.section--{{ section.id }} .c-btn--mono {
+    color: {% if text_color_brightness < 125 %}white{% else %}black{% endif %};
+    background: {{ section.settings.color_text }};
+}
+.section--{{ section.id }} .c-btn--mono:hover {
+    {% if text_color_brightness < 125 %}
+        background: {{ section.settings.color_text | color_lighten: 10 }};
+    {% else %}
+        background: {{ section.settings.color_text | color_darken: 10 }};
+    {% endif %};
+}
+.section--{{ section.id }} .collection-list__content-link.c-btn--hollow:hover {
+    {%- liquid
+        assign text_brightness = section.settings.color_text | color_brightness
+        if text_brightness > 125
+            assign text_contrast_color = '#000'
+        else
+            assign text_contrast_color = '#fff'
+        endif
+    -%}
+    color: {{ text_contrast_color }};
+    background: {{ section.settings.color_text }};
+}
+.section--{{ section.id }} .collection-list__overlay:before {
+    background: {{ section.settings.color_overlay }};
+    {% if section.settings.color_overlay_strength == 100 %}
+        opacity: 1;
+    {% else %}
+        opacity: .{{ section.settings.color_overlay_strength }};
+    {% endif %}
+}
+</style>
+
+<section class="section section--list-collections list-collections section--{{ section.id }}" data-section-id="{{ section.id }}" data-section-type="list-collections">
+    <div class="container">
+        
+        <div class="section__title section__title--center">
+            <h1 class="section__title-text h2">{{ 'collections.general.all_collections' | t }}</h1>
+        </div>
+
+        <div class="collection-list">
+
+            {%- liquid
+                assign blocks = section.blocks | sort: 'collection.all_products_count'
+
+                case section.settings.grid
+                    when 2
+                        assign grid_item_width = 'u-1/2@tab'
+                    when 3
+                        assign grid_item_width = 'u-1/3@tab'
+                    when 4
+                        assign grid_item_width = 'u-1/2@tab u-1/4@desk'
+                    when 5
+                        assign grid_item_width = 'u-1/2@tab u-1/5@desk'
+                endcase
+
+                assign grid_item_width_mobile = 'u-1/1'
+            -%}            
+
+            <div class="collection-list__items">
+                <div class="o-layout o-layout--center o-layout--small@tab-down">
+       
+                    {% if section.settings.display_type == 'all' %}
+
+                        {% case section.settings.sort %}
+                        {% when 'products_high' or 'products_low' %}
+                            {%- assign collections = collections | sort: 'all_products_count' -%}
+                        {% when 'date' or 'date_reversed' %}
+                            {%- assign collections = collections | sort: 'published_at' -%}
+                        {% endcase %}
+      
+                        {% if section.settings.sort == 'products_low' or section.settings.sort == 'date' or section.settings.sort == 'alphabetical' %}
+                            {% for collection in collections %}
+                                {%- capture current_block -%}{% cycle 1, 2, 3, 4, 5, 6 %}{%- endcapture -%}
+                                <div class="o-layout__item {{ grid_item_width }} {{ grid_item_width_mobile }}">
+                                    {% render 'collection-grid-item', 
+                                        collection: collection,
+                                        sizes: sizes,
+                                        ratio: section.settings.image_ratio,
+                                        title_size: section.settings.title_size,
+                                        alignment: section.settings.alignment, 
+                                        text_alignment: section.settings.text_alignment,
+                                        button_style: section.settings.button_style,
+                                        visibility_heading: section.settings.visibility_heading,
+                                        visibility_border: section.settings.visibility_border,
+                                        visibility_count: section.settings.visibility_count,
+                                        visibility_description: section.settings.visibility_description,
+                                        visibility_button: section.settings.visibility_button,
+                                        hover_options: section.settings.hover_options,
+                                        current_block: current_block
+                                    %}
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            {% for collection in collections reversed %}
+                                {%- capture current_block -%}{% cycle 1, 2, 3, 4, 5, 6 %}{%- endcapture -%}
+                                <div class="o-layout__item {{ grid_item_width }} {{ grid_item_width_mobile }}">
+                                    {% render 'collection-grid-item', 
+                                        collection: collection, 
+                                        ratio: section.settings.image_ratio,
+                                        title_size: section.settings.title_size,
+                                        alignment: section.settings.alignment, 
+                                        text_alignment: section.settings.text_alignment,
+                                        button_style: section.settings.button_style,
+                                        visibility_heading: section.settings.visibility_heading,
+                                        visibility_border: section.settings.visibility_border,
+                                        visibility_count: section.settings.visibility_count,
+                                        visibility_description: section.settings.visibility_description,
+                                        visibility_button: section.settings.visibility_button,
+                                        hover_options: section.settings.hover_options,
+                                        current_block: current_block
+                                    %}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    
+                    {% else %}
+                        
+                        {% for block in section.blocks %}
+                            <div class="o-layout__item {{ grid_item_width }} {{ grid_item_width_mobile }}" {{ block.shopify_attributes }}>
+                                {%- assign collection = collections[block.settings.collection] -%}
+                                {%- capture current_block -%}{% cycle 1, 2, 3, 4, 5, 6 %}{%- endcapture -%}
+
+                                {% render 'collection-grid-item', 
+                                        collection: collection, 
+                                        ratio: section.settings.image_ratio,
+                                        title_size: section.settings.title_size,
+                                        alignment: section.settings.alignment, 
+                                        text_alignment: section.settings.text_alignment,
+                                        button_style: section.settings.button_style,
+                                        visibility_heading: section.settings.visibility_heading,
+                                        visibility_border: section.settings.visibility_border,
+                                        visibility_count: section.settings.visibility_count,
+                                        visibility_description: section.settings.visibility_description,
+                                        visibility_button: section.settings.visibility_button,
+                                        hover_options: section.settings.hover_options,
+                                        button_label: block.settings.button_label,
+                                        heading: block.settings.heading,
+                                        description: block.settings.description,
+                                        link: block.settings.link,
+                                        replacement_image: block.settings.image,
+                                        current_block: current_block 
+                                    %}
+                            </div>
+                        {% endfor %}
+
+                    {% endif %}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+{% schema %}
+{
+    "name": "Collections list page",
+    "class": "js-section__list-collections", 
+    "settings": [
+        {
+            "type": "paragraph",
+            "content": "All of your collections are listed by default. To customize your list, choose 'Selected' and add collections."
+        },
+        {
+            "type": "radio",
+            "id": "display_type",
+            "label": "Select collections to show",
+            "default": "all",
+            "options": [
+                {
+                    "value": "all",
+                    "label": "All"
+                },
+                {
+                    "value": "selected",
+                    "label": "Selected"
+                }
+            ]
+        },
+        {
+        "type": "select",
+        "id": "sort",
+        "label": "Sort collections by:",
+        "info": "Sorting only applies when 'All' is selected",
+        "default": "alphabetical",
+        "options": [
+                {
+                    "value": "products_high",
+                    "label": "Product count, high to low"
+                },
+                {
+                    "value": "products_low",
+                    "label": "Product count, low to high"
+                },
+                {
+                    "value": "alphabetical",
+                    "label": "Alphabetically, A-Z"
+                },
+                {
+                    "value": "alphabetical_reversed",
+                    "label": "Alphabetically, Z-A"
+                },
+                {
+                    "value": "date",
+                    "label": "Date, old to new"
+                },
+                {
+                    "value": "date_reversed",
+                    "label": "Date, new to old"
+                }
+            ]
+        },
+        {
+            "type": "range",
+            "id": "grid",
+            "label": "Collections per row",
+            "min": 2,
+            "max": 5,
+            "step": 1,
+            "default": 3
+        },
+        {
+            "type": "header",
+            "content": "Content design"
+        },
+        {
+            "type": "range",
+            "id": "title_size",
+            "label": "Heading size",
+            "min": 1,
+            "max": 5,
+            "step": 1,
+            "default": 3
+        },
+        {
+            "type": "select",
+            "id": "image_ratio",
+            "label": "Image ratio",
+            "default": "3:4",
+            "options": [
+                {
+                    "value": "1:1",
+                    "label": "Square (1:1)"
+                },
+                {
+                    "value": "3:4",
+                    "label": "Portrait (3:4)"
+                },
+                {
+                    "value": "4:3",
+                    "label": "Landscape (4:3)"
+                },
+                {
+                    "value": "16:9",
+                    "label": "Wide (16:9)"
+                },
+                {
+                    "value": "2:3",
+                    "label": "Tall (2:3)"
+                },
+                {
+                    "value": "natural",
+                    "label": "Natural"
+                }
+            ]
+        },
+        {
+            "type": "select",
+            "id": "button_style",
+            "label": "Button style",
+            "default": "c-btn c-btn--hollow",
+            "options": [
+                {
+                    "value": "link--underline",
+                    "label": "Body text"
+                },
+                {
+                    "value": "link link--arrow",
+                    "label": "Chevron"
+                },
+                {
+                    "value": "c-btn c-btn--primary",
+                    "label": "Solid Button (brand)"
+                },
+                {
+                    "value": "c-btn c-btn--mono",
+                    "label": "Solid button (mono)"
+                },
+                {
+                    "value": "c-btn c-btn--hollow",
+                    "label": "Outline button"
+                }
+            ]
+        },
+        {
+            "type": "select",
+            "id": "alignment",
+            "label": "Text position",
+            "default": "middle-center",
+            "options": [
+                {
+                    "value": "middle-left",
+                    "label": "Left"
+                },
+                {
+                    "value": "middle-center",
+                    "label": "Center"
+                },
+                {
+                    "value": "middle-right",
+                    "label": "Right"
+                },
+                {
+                    "value": "top-left",
+                    "label": "Top left"
+                },
+                {
+                    "value": "top-center",
+                    "label": "Top center"
+                },
+                {
+                    "value": "top-right",
+                    "label": "Top right"
+                },
+                {
+                    "value": "bottom-left",
+                    "label": "Bottom left"
+                },
+                {
+                    "value": "bottom-center",
+                    "label": "Bottom center"
+                },
+                {
+                    "value": "bottom-right",
+                    "label": "Bottom right"
+                }
+            ]
+        },
+        {
+            "type": "select",
+            "id": "text_alignment",
+            "label": "Text alignment",
+            "default": "center",
+            "options": [
+                {
+                    "value": "left",
+                    "label": "Left"
+                },
+                {
+                    "value": "center",
+                    "label": "Center"
+                },
+                {
+                    "value": "right",
+                    "label": "Right"
+                }
+            ]
+        },
+        {
+            "type": "header",
+            "content": "Content visibility"
+        },
+        {
+            "type": "checkbox",
+            "id": "visibility_heading",
+            "label": "Show collection heading",
+            "default": true
+        },
+        {
+            "type": "checkbox",
+            "id": "visibility_border",
+            "label": "Show brand border",
+            "default": true
+        },
+        {
+            "type": "checkbox",
+            "id": "visibility_count",
+            "label": "Show product count",
+            "default": false
+        },
+        {
+            "type": "checkbox",
+            "id": "visibility_description",
+            "label": "Show collection description",
+            "default": false
+        },
+        {
+            "type": "checkbox",
+            "id": "visibility_button",
+            "label": "Show button",
+            "default": true
+        },
+        {
+            "type": "select",
+            "id": "hover_options",
+            "label": "Display on hover (desktop)",
+            "default": "hover-button",
+            "options": [
+                {
+                    "value": "hover-off",
+                    "label": "Off"
+                },
+                {
+                    "value": "hover-all",
+                    "label": "All content"
+                },
+                {
+                    "value": "hover-button",
+                    "label": "Buttons"
+                }
+            ]
+        },
+        {
+            "type": "header",
+            "content": "Content color"
+        },
+        {
+            "type": "color",
+            "id": "color_text",
+            "label": "Text color",
+            "default": "#ffffff"
+        },
+        {
+            "type": "color",
+            "id": "color_overlay",
+            "label": "Overlay color",
+            "default": "#000000"
+        },
+        {
+            "type": "range",
+            "id": "color_overlay_strength",
+            "label": "Overlay strength",
+            "unit": "%",
+            "min": 0,
+            "max": 100,
+            "step": 10,
+            "default": 20
+        },
+        {
+            "type": "checkbox",
+            "id": "color_default_heading",
+            "label": "Use default heading color",
+            "default": false
+        },
+        {
+            "type": "checkbox",
+            "id": "color_default_border",
+            "label": "Use default brand border color",
+            "default": true
+        }
+    ],
+    "blocks": [
+        {
+            "type": "collection",
+            "name": "Collection",
+            "settings": [
+                {
+                    "label": "Collection",
+                    "id": "collection",
+                    "type": "collection"
+                },
+                {
+                    "type": "header",
+                    "content": "Replacement content",
+                    "info": "You can use the following fields to override the default collection content."
+                },
+                {
+                    "type": "text",
+                    "id": "heading",
+                    "label": "Heading"
+                },
+                {
+                    "type": "text",
+                    "id": "description",
+                    "label": "Description"
+                },
+                {
+                    "type": "text",
+                    "id": "button_label",
+                    "label": "Button label"
+                },
+                {
+                    "type": "url",
+                    "id": "link",
+                    "label": "Link"
+                },
+                {
+                    "type": "image_picker",
+                    "id": "image",
+                    "label": "Image"
+                }
+            ]
+        }
+    ]
+}
+{% endschema %}

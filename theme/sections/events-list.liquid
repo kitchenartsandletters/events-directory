@@ -1,0 +1,11 @@
+{% comment %}
+  Section: Events List
+  Renders a container for event cards and loads our JS & CSS assets
+{% endcomment %}
+
+<div id="events-container" class="events-wrapper">
+  <!-- Event cards will be injected here by JS -->
+</div>
+
+<link href="{{ 'events.css' | asset_url }}" rel="stylesheet" />
+<script src="{{ 'events.js'   | asset_url }}" defer></script>

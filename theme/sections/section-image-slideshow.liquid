@@ -1,0 +1,271 @@
+{% if section.blocks.size > 0 %}
+<style>
+.section--{{ section.id }} .home-carousel__nav-dots .slick-dots li.slick-active button,
+.section--{{ section.id }} .home-carousel__nav-dots .slick-dots li:hover button,
+.section--{{ section.id }} .home-carousel__nav-dots .slick-dots li:focus button {
+    {% if section.settings.nav_style == 'solid-brand' %}
+        background: {{ settings.color_brand }};
+    {% else %}
+        background: #fff;
+    {% endif %}
+}
+.section--{{ section.id }} .home-carousel__nav--solid .slick-dots li button {
+    background: {{ '#ffffff' | color_modify: 'alpha', 0.4 }};
+    border-color: transparent;
+}
+.section--{{ section.id }} .home-carousel__nav--outline .slick-dots li button {
+    border-color: #fff;
+}
+.section--{{ section.id }} .home-carousel__nav--outline .slick-dots li.slick-active button,
+.section--{{ section.id }} .home-carousel__nav--outline .slick-dots li:hover button,
+.section--{{ section.id }} .home-carousel__nav--outline .slick-dots li:focus button {
+    background: transparent;
+    box-shadow: 0px 0px 0px 1px #fff;
+}
+.section--{{ section.id }} .home-carousel--image-overlay:before,
+.section--{{ section.id }} .home-carousel--image-overlay:before {
+    background: {{ section.settings.overlay_color }};
+    {% if section.settings.overlay_strength == 100 %}
+        opacity: 1;
+    {% else %}
+        opacity: .{{ section.settings.overlay_strength }};
+    {% endif %}
+}
+{% if section.settings.nav_arrows %}
+    .section--{{ section.id }} .home-carousel__nav__item {
+        display: none !important;
+    }
+{% endif %}
+
+/* Loading states */
+body[data-editor-mode="false"] .home-carousel--image--loading {
+    position: relative;
+    overflow: hidden;
+}
+body[data-editor-mode="false"] .home-carousel--image--loading::before {
+    content: '';
+    display: block;
+    float: left;
+    position: relative;
+    width: 100%;
+    padding-bottom: {%- if section.blocks[0].settings.image.aspect_ratio -%}{{ 100 | divided_by: section.blocks[0].settings.image.aspect_ratio }}{%- else -%}100{%- endif -%}%;
+}
+body[data-editor-mode="false"] .home-carousel--image--loading div {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+body[data-editor-mode="false"] .home-carousel--image--loading div:not(:first-of-type) {
+    display: none;
+}
+
+{% if request.design_mode %}
+/* Fixing loading scroll when new slide is added in the editor */
+    .home-carousel--image--loading > div:not(:first-child) {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+    }
+{% endif %}
+</style>
+<noscript>
+    <style>
+        .home-carousel--image--loading::before {
+            display: none;
+        }
+        .home-carousel--image--loading div {
+            position: relative;
+        }
+        .home-carousel--image--loading div:not(:first-of-type)  {
+            display: block;
+        }
+
+    </style>
+</noscript>
+<section class="section section--{{ section.id }} {% if section.settings.slideshow_width == 'full' %} section--full section--full-mobile{% endif %}{% if section.settings.section-bottom-margin %}{% if section.settings.slideshow_width == 'contained' %} section--mb-m{% else %} section--mb-0{% endif %}{% endif %}" data-section-id="{{ section.id }}" data-section-type="home-carousel">
+    {% if section.settings.slideshow_width == 'contained' %}<div class="container">{% endif %}
+
+        <div class="home-carousel-wrapper home-carousel-wrapper--{{ section.settings.slideshow_width }}">
+
+        <div class="home-carousel home-carousel--image js-home-carousel {% if section.settings.slideshow_width == 'full' %}home-carousel--full{% else %}home-carousel--contained{% endif %} home-carousel--image--loading" data-autoplay="{{ section.settings.autoplay }}" data-slick='{"autoplay": {{ section.settings.autoplay }}, "autoplaySpeed": {{ section.settings.autoplay_speed }}000, "adaptiveHeight": true}'>
+            {% for block in section.blocks %}
+                <div {{ block.shopify_attributes }}>
+                    {% unless block.settings.link == blank %}
+                    <a href="{{ block.settings.link }}" class="home-carousel--image_link">
+                    {% endunless %}
+
+                        <div class="home-carousel__item home-carousel__item--{{ block.id }}" data-slide-id="{{ forloop.index0 }}">
+                            {% unless block.settings.image == blank %}
+                                {%- assign img_url = block.settings.image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+                                <img
+                                    class="home-carousel--image_img"
+                                    src="{{ block.settings.image | img_url: '300x' }}"
+                                    srcset="{% render 'bgset', image: block.settings.image %}"
+                                    width="300"
+                                    height="{{ 300 | divided_by: block.settings.image.aspect_ratio | round }}"
+                                    alt="{{ block.settings.image.alt }}"
+                                    loading="lazy"
+                                />
+                            {% else %}
+                                {% capture current %}{% cycle 1, 2 %}{% endcapture %}
+                                {{ 'lifestyle-' | append: current | placeholder_svg_tag: 'placeholder-svg' }}
+                            {% endunless %}
+                        </div>
+                        <div class="home-carousel--image-overlay u-bg-overlay"></div>
+
+                    {% unless block.settings.link == blank %}
+                    </a>
+                    {% endunless %}
+                </div>
+            {% endfor %}
+        </div>
+
+        {%- if section.blocks.size > 1 -%}
+            <div class="home-carousel__nav js-home-carousel-nav{% if section.settings.nav_style contains 'solid' %} home-carousel__nav--solid{% endif %}{% if section.settings.nav_style contains 'outline' %} home-carousel__nav--outline{% endif %}">
+                <div class="home-carousel__nav-dots js-home-carousel-nav-dots"></div>
+            </div>
+        {%- endif -%}
+
+    </div>
+
+    {% if section.settings.slideshow_width == 'contained' %}</div>{% endif %}
+</section>
+{% endif %}
+
+{% if section.blocks.size == 0 %}
+    <div class="placeholder-noblocks">
+        {{ 'homepage.onboarding.no_content' | t }}
+    </div>
+{% endif %}
+
+{% schema %}
+{
+    "name": "Image slideshow",
+    "class": "js-section__home-slider",
+    "max_blocks": 5,
+    "settings": [
+        {
+            "type": "checkbox",
+            "id": "autoplay",
+            "label": "Auto-rotate slides",
+            "default": true
+        },
+        {
+            "type": "range",
+            "id": "autoplay_speed",
+            "label": "Change slides every",
+            "unit": "sec",
+            "min": 5,
+            "max": 10,
+            "step": 1,
+            "default": 8
+        },
+        {
+            "type": "select",
+            "id": "nav_style",
+            "label": "Slide navigation style",
+            "default": "solid-brand",
+            "options": [
+                {
+                    "value": "solid-brand",
+                    "label": "Solid dots (brand)"
+                },
+                {
+                    "value": "solid-mono",
+                    "label": "Solid dots (mono)"
+                },
+                {
+                    "value": "outline",
+                    "label": "Outline dots"
+                }
+            ]
+        },
+        {
+            "type": "checkbox",
+            "id": "nav_arrows",
+            "label": "Hide navigation arrows",
+            "default": false
+        },
+        {
+            "type": "select",
+            "id": "slideshow_width",
+            "label": "Section width",
+            "default": "contained",
+            "options": [
+                {
+                    "label": "Contained",
+                    "value": "contained"
+                },
+                {
+                    "label": "Full",
+                    "value": "full"
+                }
+            ]
+        },
+        {
+            "type": "color",
+            "id": "overlay_color",
+            "label": "Overlay color",
+            "default": "#000000"
+        },
+        {
+            "type": "range",
+            "id": "overlay_strength",
+            "label": "Overlay strength",
+            "unit": "%",
+            "min": 0,
+            "max": 100,
+            "step": 10,
+            "default": 0
+        },
+        {
+            "type": "checkbox",
+            "id": "section-bottom-margin",
+            "label": "Reduce bottom margin",
+            "default": false
+        }
+    ],
+    "blocks": [
+        {
+            "type": "image",
+            "name": "Image slide",
+            "settings": [
+                {
+                    "type": "image_picker",
+                    "id": "image",
+                    "label": "Image",
+                    "info": "2200px width recommended."
+                },
+                {
+                    "type": "url",
+                    "id": "link",
+                    "label": "Link"
+                }
+            ]
+        }
+    ],
+    "presets": [
+        {
+            "name": "Image slideshow",
+            "settings": {
+                "autoplay": true,
+                "autoplay_speed": 8
+            },
+            "blocks": [
+                {
+                    "type": "image"
+                },
+                {
+                    "type": "image"
+                }
+            ]
+        }
+    ],
+    "enabled_on": {
+        "templates": ["*"],
+        "groups": ["footer"]
+    }
+}
+{% endschema %}

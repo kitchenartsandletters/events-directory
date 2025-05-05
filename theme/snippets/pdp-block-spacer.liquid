@@ -1,0 +1,16 @@
+{% comment %}
+    Renders product page spacer block
+
+    Accepts:
+    - border: {Boolean}
+    - top: {String}
+    - bottom: {String}
+{% endcomment %}
+
+<div class="
+    product-form__spacer 
+    product-form__spacer--top-{{ top }} 
+    product-form__spacer--bottom-{{ bottom }} 
+    {% if border %} product-form__spacer--has-border{% endif %}
+  ">    
+</div>

@@ -1,0 +1,10 @@
+{
+  "name": "Events",
+  "sections": {
+    "events": {
+      "type": "events-list",
+      "settings": {}
+    }
+  },
+  "order": ["events"]
+}

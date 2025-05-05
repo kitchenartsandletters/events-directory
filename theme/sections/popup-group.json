@@ -1,0 +1,44 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "name": "Pop-ups",
+  "type": "aside",
+  "sections": {
+    "promo-pop": {
+      "type": "promo-pop",
+      "disabled": true,
+      "settings": {
+        "mobile": true,
+        "title": "Popup",
+        "text": "<p>Use this popup to embed a mailing list sign up form. Alternatively use it as a simple call to action with a link to a product or a page.</p>",
+        "link_title": "More info",
+        "link": "",
+        "delay": 3,
+        "expiry": 7,
+        "enable_newsletter": true
+      }
+    },
+    "age-checker": {
+      "type": "age-checker",
+      "disabled": true,
+      "settings": {
+        "title": "Age verification",
+        "text": "<p>By clicking enter you are verifying that you are old enough to consume alcohol.</p>",
+        "enter_btn_label": "Enter",
+        "leave_btn_label": "Leave",
+        "leave_link": ""
+      }
+    }
+  },
+  "order": [
+    "promo-pop",
+    "age-checker"
+  ]
+}
