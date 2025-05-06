@@ -1,7 +1,7 @@
 // ===== CONFIGURE =====
 // Your Sheet’s ID (from the URL: https://docs.google.com/spreadsheets/d/<THIS_ID>/edit)
 const SHEET_ID   = '1d68hoZ-SbralpbobW-AU9QupKuIsOfAHC-8L9jVSaRQ';
-const SHEET_NAME = 'Events Directory';
+const SHEET_NAME = 'Sheet1';
 
 // ===== JSON FEED =====
 function doGet(e) {

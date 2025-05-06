@@ -1,30 +1,174 @@
-/* Container */
+/* Container: responsive grid */
 .events-wrapper {
-  display: grid;
-  gap: 1rem;
-}
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 400px));
+    justify-content: center;
+    gap: 1.5rem;
+    padding: 1rem 0;
+  }
+  
+  /* Base card styling */
+  .event-card {
+    background: var(--bg, #fff);
+    color: var(--fg, #000);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    transition: transform .2s ease, box-shadow .2s ease;
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    grid-template-rows: auto 1fr;
+    position: relative;
+  }
+  
+  /* Hover effect */
+  .event-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  }
+  
+  /* Image: maintain aspect ratio */
+  .event-image {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    display: block;
+    position: relative;
+    z-index: 1;
+  }
+  
+  /* Header and content spacing */
+  .event-header {
+    padding: 0.75rem 1rem 0.5rem;
+  }
+  
+  .event-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    line-height: 1.2;
+  }
+  
+  .event-header time {
+    display: block;
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 0.25rem;
+  }
+  
+  .event-card p {
+    flex-grow: 1;
+    padding: 0 1rem 1rem;
+    margin: 0;
+    line-height: 1.4;
+  }
+  
+  /* Button styling */
+  .event-btn {
+    margin: 0 1rem 1rem;
+    padding: 0.5rem 1rem;
+    background: #007acc;
+    color: #fff;
+    text-align: center;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background .2s ease;
+  }
+  
+  .event-btn:hover {
+    background: #005fa3;
+  }
+  
+  /* Example venue overrides */
+  .venue-kitchen-arts-&-letters { --bg: #fdf6f0; --fg: #332210; }
+  
+  @media (max-width: 600px) {
+    .events-wrapper {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+  }
 
-/* Base event card */
-.event-card {
-  background: var(--bg, #fff);
-  color: var(--fg, #000);
-  border-radius: 8px;
-  padding: 1rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
+  /* Updated card padding and positioning */
+  .event-card {
+    padding: 0px;
+    position: relative;
+  }
 
-/* Venue‑based defaults */
-.venue-92y { --bg: #f5f0e1; --fg: #333; }
-.venue-union-square-greenmarket { --bg: #e1f5e1; --fg: #245e24; }
-/* …add rules for each venue… */
+  /* Date block in top-left */
+  .event-date-block {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20%;
+    aspect-ratio: 1;
+    background: #000;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    z-index: 2;
+    line-height: 1;
+    grid-column: 1;
+    grid-row: 1 / span 2;
+  }
+  .event-date-month {
+    margin: 0;
+    line-height: 1;
+    margin-bottom: 0.1em;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+  }
+  .event-date-day {
+    margin: 0;
+    line-height: 1;
+    font-size: 1.75rem;
+    font-weight: bold;
+  }
 
-/* Button */
-.event-btn {
-  display: inline-block;
-  margin-top: 0.5rem;
-  padding: 0.5rem 1rem;
-  text-decoration: none;
-  border-radius: 4px;
-  background: #007acc;
-  color: #fff;
-}
+  /* Shift header to accomodate date block */
+
+  /* Time block styling */
+  .event-time {
+    background: #f0f0f0;
+    padding: 8px;
+    margin-top: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.9rem;
+  }
+
+  /* Content area next to date block */
+  .event-content {
+    grid-column: 2;
+    grid-row: 2;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+  }
+
+  .event-type,
+  .event-venue {
+    color: #555;
+    line-height: 1;
+    margin: 0.25em 0 0.5em;
+    font-size: 0.9rem;
+  }
+  h3.event-name {
+    margin: 0.3em 0;
+    line-height: 1;
+    font-size: 32px;
+  }
+
+  /* Button styling override */
+  .event-btn {
+    background: #00008f;
+    color: #fff;
+    margin-top: 20px;
+  }
