@@ -78,7 +78,7 @@ window.handleEvents = function(rawEvents) {
           </svg>
           ${timeHtml}
         </div>
-        <p class="event-description">${e.Description}</p>
+        ${e['Button Enabled'] ? `<a class="event-btn" href="${e['Button Link']}">${e['Button Text']}</a>` : ''}
       </div>
     `;
     card.innerHTML = html;
@@ -86,7 +86,10 @@ window.handleEvents = function(rawEvents) {
   
     // Make card clickable to open detail modal
     card.style.cursor = 'pointer';
-    card.addEventListener('click', () => showEventModal(e));
+    card.addEventListener('click', () => {
+      console.log('card clicked:', e);
+      showEventModal(e);
+    });
   });
 };
 
@@ -149,14 +152,17 @@ function showEventModal(e) {
     actions.innerHTML = `<a class="event-btn" href="${e['Button Link']}">${e['Button Text']}</a>`;
   }
 
-  // Show modal
+  // Show modal: remove hidden, add active
   overlay.classList.remove('hidden');
+  overlay.classList.add('active');
 }
 
 // Close modal on clicking the close button or overlay
 document.body.addEventListener('click', (evt) => {
   if (evt.target.matches('.modal-close') || evt.target.id === 'event-modal-overlay') {
-    document.getElementById('event-modal-overlay').classList.add('hidden');
+    const overlay = document.getElementById('event-modal-overlay');
+    overlay.classList.add('hidden');
+    overlay.classList.remove('active');
   }
 });
 

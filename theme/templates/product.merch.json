@@ -29,15 +29,7 @@
         },
         "80f5a9ff-152c-4ce4-b76d-7f840fcaeb1c": {
           "type": "shopify://apps/growave-loyalty-wishlist/blocks/block.product.reviewAvgProfile/b3d2efbe-110a-4e27-84a8-1f2ed63996a4",
-          "settings": {
-            "margin": "",
-            "textColor": "",
-            "fontSize": "",
-            "ratingIconColor": "",
-            "ratingIconSize": "",
-            "questionsIconColor": "",
-            "questionsIconSize": ""
-          }
+          "settings": {}
         },
         "89a9ed8e-21f6-4d42-a4a2-04362d3c52ab": {
           "type": "sku",
@@ -286,27 +278,7 @@
       "blocks": {
         "ca89dbfc-cf37-4849-bbfd-2b059321c6b0": {
           "type": "shopify://apps/growave-loyalty-wishlist/blocks/block.product.reviewWidget/b3d2efbe-110a-4e27-84a8-1f2ed63996a4",
-          "settings": {
-            "containerMaxWidth": "",
-            "containerMarginTop": "",
-            "containerMarginBottom": "",
-            "containerSidePadding": "",
-            "containerLineHeight": "",
-            "containerFontFamily": "",
-            "containerLetterSpacing": "",
-            "buttonsColor": "",
-            "buttonsColorOnHover": "",
-            "buttonsBackgroundColor": "",
-            "buttonsBackgroundColorOnHover": "",
-            "buttonsBorder": "",
-            "buttonsBorderColorOnHover": "",
-            "buttonsBoxShadow": "",
-            "buttonsBoxShadowOnHover": "",
-            "buttonsPaddings": "",
-            "buttonsTextTransform": "",
-            "tabTriggerSelector": "",
-            "tabContentSelector": ""
-          }
+          "settings": {}
         }
       },
       "block_order": [

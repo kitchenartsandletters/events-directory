@@ -15,9 +15,9 @@
     overflow: hidden;
     box-shadow: 0 4px 8px rgba(0,0,0,0.05);
     transition: transform .2s ease, box-shadow .2s ease;
-    display: grid;
-    grid-template-columns: 80px 1fr;
-    grid-template-rows: auto 1fr;
+    display: flex;
+    flex-direction: column;
+    padding: 0; /* remove grid padding */
     position: relative;
   }
   
@@ -29,9 +29,8 @@
   
   /* Image: maintain aspect ratio */
   .event-image {
-    grid-column: 1 / -1;
-    grid-row: 1;
     width: 100%;
+    margin: 0;
     aspect-ratio: 16 / 9;
     object-fit: cover;
     display: block;
@@ -91,12 +90,6 @@
     }
   }
 
-  /* Updated card padding and positioning */
-  .event-card {
-    padding: 0px;
-    position: relative;
-  }
-
   /* Date block in top-left */
   .event-date-block {
     position: absolute;
@@ -113,8 +106,6 @@
     text-align: center;
     z-index: 2;
     line-height: 1;
-    grid-column: 1;
-    grid-row: 1 / span 2;
   }
   .event-date-month {
     margin: 0;
@@ -130,8 +121,6 @@
     font-weight: bold;
   }
 
-  /* Shift header to accomodate date block */
-
   /* Time block styling */
   .event-time {
     background: #f0f0f0;
@@ -145,9 +134,7 @@
 
   /* Content area next to date block */
   .event-content {
-    grid-column: 2;
-    grid-row: 2;
-    padding: 1rem;
+    padding: 40px;
     display: flex;
     flex-direction: column;
     gap: 0.5em;
@@ -156,8 +143,8 @@
   .event-type,
   .event-venue {
     color: #555;
-    line-height: 1;
-    margin: 0.25em 0 0.5em;
+    line-height: 0.5;
+    margin: 0;
     font-size: 0.9rem;
   }
   h3.event-name {
@@ -172,3 +159,81 @@
     color: #fff;
     margin-top: 20px;
   }
+
+/* ===== Event Modal Styles ===== */
+#event-modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;              /* always present */
+  opacity: 0;                 /* hidden by default */
+  visibility: hidden;         /* remove from assistive tools */
+  pointer-events: none;       /* disable interactions */
+  transition: opacity 0.3s ease-out, visibility 0s linear 0.3s;
+  background: rgba(0, 0, 0, 0.5);
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+#event-modal-overlay.active {
+  opacity: 1;                 /* fade in */
+  visibility: visible;        /* make visible immediately */
+  pointer-events: auto;       /* re-enable interactions */
+  transition-delay: 0s;       /* show without delay */
+}
+
+#event-modal {
+  background: #fff;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  transform: scale(0.95);
+  opacity: 0;
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+}
+
+#event-modal-overlay.active #event-modal {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.modal-content {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-image {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.modal-meta {
+  color: #555;
+  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.modal-actions .event-btn {
+  margin: 0;
+  display: inline-block;
+}
