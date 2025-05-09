@@ -117,19 +117,21 @@
   .event-date-day {
     margin: 0;
     line-height: 1;
-    font-size: 1.75rem;
+    font-size: 2.5rem;
     font-weight: bold;
   }
 
   /* Time block styling */
   .event-time {
     background: #f0f0f0;
-    padding: 8px;
+    padding: 4px 12px;
     margin-top: 8px;
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
     font-size: 0.9rem;
+    border-radius: 9999px; /* pill shape */
+    align-self: flex-start;
   }
 
   /* Content area next to date block */
@@ -140,12 +142,24 @@
     gap: 0.5em;
   }
 
-  .event-type,
-  .event-venue {
+  .event-type {
     color: #555;
     line-height: 0.5;
     margin: 0;
     font-size: 0.9rem;
+  }
+
+  .event-venue {
+    background: #f0f0f0;
+    padding: 4px 12px;
+    margin-top: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+    /*color: #555;*/
+    border-radius: 9999px; /* pill shape */
+    align-self: flex-start;
   }
   h3.event-name {
     margin: 0.3em 0;

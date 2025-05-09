@@ -55,6 +55,9 @@ window.handleEvents = function(rawEvents) {
       timeHtml = `${startTimeStr} – ${endTimeStr}`;
     }
 
+    // For teaser, only show the start time
+    const teaserTime = startTimeStr;
+
     // Build the inner HTML for the card
     let html = `
       <div class="event-date-block">
@@ -71,12 +74,17 @@ window.handleEvents = function(rawEvents) {
       <div class="event-content">
         <div class="event-type">${e['Event Type'].toUpperCase()}</div>
         <h3 class="event-name">${e['Event Name']}</h3>
-        <div class="event-venue">${e.Venue}</div>
         <div class="event-time">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M12 1a11 11 0 1 0 11 11A11.012 11.012 0 0 0 12 1zm0 20a9 9 0 1 1 9-9 9.01 9.01 0 0 1-9 9zm.5-9.5h5v1h-4.5V6h1z"/>
           </svg>
-          ${timeHtml}
+          ${teaserTime}
+        </div>
+        <div class="event-venue">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
+          </svg>
+          ${e.Venue}
         </div>
         ${e['Button Enabled'] ? `<a class="event-btn" href="${e['Button Link']}">${e['Button Text']}</a>` : ''}
       </div>
