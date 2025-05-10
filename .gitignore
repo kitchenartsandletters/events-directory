@@ -1,0 +1,19 @@
+# At events-directory/.gitignore
+
+# Node modules and logs
+events-slack-app/node_modules/
+events-slack-app/npm-debug.log*
+events-slack-app/yarn-error.log*
+
+# Environment files
+events-slack-app/.env
+events-slack-app/.env.example
+*.env
+.env.example
+
+# Editor artifacts
+.DS_Store
+.idea/
+.vscode/
+
+fluid-door-434514-j5-0d47fd696e88.json
