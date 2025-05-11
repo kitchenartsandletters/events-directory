@@ -1,6 +1,7 @@
 # At events-directory/.gitignore
 
 # Node modules and logs
+node_modules/
 events-slack-app/node_modules/
 events-slack-app/npm-debug.log*
 events-slack-app/yarn-error.log*
