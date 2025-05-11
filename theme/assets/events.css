@@ -123,7 +123,9 @@
 
   /* Time block styling */
   .event-time {
-    background: #f0f0f0;
+    background: var(--pill-bg);
+    filter: saturate(150%);
+    /* background: #f0f0f0; */
     padding: 4px 12px;
     margin-top: 8px;
     display: inline-flex;
@@ -143,6 +145,7 @@
   }
 
   .event-type {
+    filter: saturate(150%);
     color: #555;
     line-height: 0.5;
     margin: 0;
@@ -150,7 +153,9 @@
   }
 
   .event-venue {
-    background: #f0f0f0;
+    background: var(--pill-bg);
+    filter: saturate(150%);
+    /* background: #f0f0f0; */
     padding: 4px 12px;
     margin-top: 0;
     display: inline-flex;
@@ -169,9 +174,11 @@
 
   /* Button styling override */
   .event-btn {
-    background: #00008f;
-    color: #fff;
+    background: #fff;
+    color: #000000 !important;
     margin-top: 20px;
+    /* Inner top-left shadow */
+    box-shadow: inset -2px -2px 5px rgba(0, 0, 0, 0.2);
   }
 
 /* ===== Event Modal Styles ===== */

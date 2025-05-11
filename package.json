@@ -1,5 +1,11 @@
 {
+  "scripts": {
+    "start": "node events-slack-app/src/app.js"
+  },
   "dependencies": {
+    "@slack/bolt": "^4.3.0",
+    "dotenv": "^16.5.0",
+    "googleapis": "^148.0.0",
     "uuid": "^11.1.0"
   }
 }

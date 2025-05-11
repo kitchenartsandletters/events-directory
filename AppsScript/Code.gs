@@ -14,8 +14,18 @@ function doGet(e) {
     headers.forEach((h, i) => obj[h] = row[i]);
     return obj;
   });
-  const json     = JSON.stringify(events);
-  const callback = e.parameter.callback;
+  // Read Venues sheet
+  const vSheet  = ss.getSheetByName('Venues');
+  const vData   = vSheet.getDataRange().getValues();
+  const vHeaders= vData.shift();
+  const venues  = vData.map(row => {
+    const vObj = {};
+    vHeaders.forEach((h, j) => vObj[h] = row[j]);
+    return vObj;
+  });
+  const payloadObj = { events, venues };
+  const json       = JSON.stringify(payloadObj);
+  const callback   = e.parameter.callback;
   if (callback) {
     // Return JSONP if a callback parameter is provided
     return ContentService

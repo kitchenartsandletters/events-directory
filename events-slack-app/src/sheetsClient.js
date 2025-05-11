@@ -28,7 +28,7 @@ async function fetchEvents() {
   const sheets = await getSheetsClient();
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId: process.env.SPREADSHEET_ID,
-    range: 'Events Master!A2:M'
+    range: 'Events Master!A2:N'
   });
   const rows = res.data.values || [];
   const headers = [
@@ -44,9 +44,12 @@ async function fetchEvents() {
     'Publish State',
     'Button Enabled',
     'Button Text',
-    'Button Link'
+    'Button Link',
+    'RowIndex'
   ];
-  return rows.map(r => Object.fromEntries(headers.map((h, i) => [h, r[i]])));
+  return rows.map(r => Object.fromEntries(
+    headers.map((h, i) => [h, h === 'RowIndex' ? parseInt(r[i], 10) : r[i]])
+  ));
 }
 
 /**
@@ -133,4 +136,29 @@ async function updateEvent(eventObj) {
   });
 }
 
-module.exports = { fetchEvents, appendEvent, updateEvent };
+/**
+ * Fetches all venue rows from the "Venues" sheet and returns them as objects.
+ */
+async function fetchVenues() {
+  const sheets = await getSheetsClient();
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: process.env.SPREADSHEET_ID,
+    range: 'Venues!A2:H'
+  });
+  const rows = res.data.values || [];
+  const headers = [
+    'Key',
+    'Display Name',
+    'Card BG Color',
+    'BG Color',
+    'Card Text Color',
+    'Text Color',
+    'Address',
+    'Map URL'
+  ];
+  return rows.map(r => Object.fromEntries(
+    headers.map((h, i) => [h, r[i] || ''])
+  ));
+}
+
+module.exports = { fetchEvents, appendEvent, updateEvent, fetchVenues };
