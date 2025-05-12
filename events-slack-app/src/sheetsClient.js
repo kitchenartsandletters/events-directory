@@ -103,82 +103,56 @@ async function appendEvent(eventObj) {
   return id;
 }
 
-
 /**
- * Listener for the edit-event modal submission.
- * Updates the event row in the sheet.
+ * Updates an existing event row in the "Events Master" sheet.
+ * Expects eventObj.RowIndex (1-based, including header row) and the same keys as appendEvent.
  */
-async function handleEditEventSubmission({ ack, body, client }) {
-  await ack();
-  const values = body.view.state.values;
-  // Retrieve original event for fallback values
-  const meta = JSON.parse(body.view.private_metadata);
-  const allEvents = await fetchEvents();
-  const originalEvent = allEvents.find(e => e.ID === meta.ID);
-
-  // Normalize original Start Time (handle comma‑separated formats)
-  const rawOrigStart = (originalEvent['Start Time'] || '').replace(/,/g, '');
-  const msOrigStart = Date.parse(rawOrigStart);
-  const normalizedOrigStart = Number.isFinite(msOrigStart)
-    ? toEtIso(new Date(msOrigStart))
-    : originalEvent['Start Time'];
-
-  // Normalize original End Time
-  const rawOrigEnd = (originalEvent['End Time'] || '').replace(/,/g, '');
-  const msOrigEnd = Date.parse(rawOrigEnd);
-  const normalizedOrigEnd = Number.isFinite(msOrigEnd)
-    ? toEtIso(new Date(msOrigEnd))
-    : originalEvent['End Time'];
-
-  // Get selected values from the modal
-  const selectedPublishState = values.publish.value.selected_option.value;
-  const selectedButtonEnabled = values.buttonEnabled.value.selected_option.value;
+async function updateEvent(eventObj) {
+  console.log('In updateEvent, received eventObj:', JSON.stringify(eventObj));
+  console.log('Publish State type:', typeof eventObj['Publish State']);
+  console.log('Publish State value:', eventObj['Publish State']);
   
-  // Convert "Published"/"Draft" to boolean true/false for the sheet
-  const publishState = selectedPublishState === 'Published';
+  // Ensure Publish State is a boolean
+  const publishState = typeof eventObj['Publish State'] === 'boolean' 
+    ? eventObj['Publish State'] 
+    : String(eventObj['Publish State']).toUpperCase() === 'TRUE';
   
-  // Convert "true"/"false" string to boolean for Button Enabled
-  const buttonEnabled = selectedButtonEnabled === 'true';
-
-  console.log('Selected publish state:', selectedPublishState, '→', publishState);
-  console.log('Selected button enabled:', selectedButtonEnabled, '→', buttonEnabled);
-
-  const updatedEvent = {
-    RowIndex: meta.RowIndex,
-    ID: meta.ID,
-    'Event Name': values.name.value.value,
-    'Event Type': values.type.value.selected_option.value,
-    // Use new pick if provided, otherwise keep original (normalized)
-    'Start Time': values.start.value.selected_date_time
-      ? toEtIso(new Date(values.start.value.selected_date_time * 1000))
-      : normalizedOrigStart,
-    'End Time':   values.end.value.selected_date_time
-      ? toEtIso(new Date(values.end.value.selected_date_time * 1000))
-      : normalizedOrigEnd,
-    'Venue Key':      values.venue.value.selected_option.value,
-    'Description':    values.description.value.value,
-    'Host':           values.host.value.value,
-    'Publish State':  publishState, // Should be a boolean now
-    'Image URL':      values.imageUrl?.value.value || '',
-    'Button Enabled': buttonEnabled, // Should be a boolean now
-    'Button Text':    values.buttonText?.value.value || '',
-    'Button Link':    values.buttonLink?.value.value || ''
-  };
-
-  try {
-    console.log('Publishing event with publish state:', updatedEvent['Publish State']);
-    await updateEvent(updatedEvent);
-    await client.chat.postMessage({
-      channel: body.user.id,
-      text: `✅ Event *${updatedEvent['Event Name']}* updated. Publish State: ${publishState ? 'Published' : 'Draft'}`
-    });
-  } catch (error) {
-    console.error('Error updating event in Sheets:', error);
-    await client.chat.postMessage({
-      channel: body.user.id,
-      text: `❌ There was an error saving your changes. Please try again. Error: ${error.message}`
-    });
-  }
+  // Ensure Button Enabled is a boolean
+  const buttonEnabled = typeof eventObj['Button Enabled'] === 'boolean'
+    ? eventObj['Button Enabled']
+    : String(eventObj['Button Enabled']).toLowerCase() === 'true';
+    
+  console.log('Final Publish State:', publishState);
+  console.log('Final Button Enabled:', buttonEnabled);
+  
+  const sheets = await getSheetsClient();
+  // Build the row in the correct column order
+  const row = [
+    eventObj.ID,
+    eventObj['Event Name'],
+    eventObj['Event Type'],
+    eventObj['Start Time'],
+    eventObj['End Time'],
+    eventObj['Venue Key'],
+    eventObj['Description'],
+    eventObj['Image URL'] || '',
+    eventObj['Host'] || '',
+    publishState, // Explicitly pass the boolean value
+    buttonEnabled, // Explicitly pass the boolean value
+    eventObj['Button Text'] || '',
+    eventObj['Button Link'] || ''
+  ];
+  
+  console.log('Row being sent to the sheet:', row);
+  
+  // Calculate A1 range for the row (RowIndex should be the sheet row number)
+  const range = `Events Master!A${eventObj.RowIndex}:M${eventObj.RowIndex}`;
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: process.env.SPREADSHEET_ID,
+    range,
+    valueInputOption: 'USER_ENTERED',
+    resource: { values: [row] }
+  });
 }
 
 /**
