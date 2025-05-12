@@ -14,6 +14,8 @@ function doGet(e) {
     headers.forEach((h, i) => obj[h] = row[i]);
     return obj;
   });
+  // Filter to only include events marked as Published
+  const publishedEvents = events.filter(evt => evt['Publish State'] === 'Published');
   // Read Venues sheet
   const vSheet  = ss.getSheetByName('Venues');
   const vData   = vSheet.getDataRange().getValues();
@@ -23,7 +25,7 @@ function doGet(e) {
     vHeaders.forEach((h, j) => vObj[h] = row[j]);
     return vObj;
   });
-  const payloadObj = { events, venues };
+  const payloadObj = { events: publishedEvents, venues };
   const json       = JSON.stringify(payloadObj);
   const callback   = e.parameter.callback;
   if (callback) {
