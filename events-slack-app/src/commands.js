@@ -429,7 +429,8 @@ async function handleCreateEventSubmission({ ack, body, client }) {
     'Venue Key': values.venue.value.value,
     'Description': values.description.value.value,
     'Host': values.host.value.value,
-    'Publish State': values.publish.value.selected_option.value,
+    // Map "Published"/"Draft" to boolean
+    'Publish State': values.publish.value.selected_option.value === 'Published',
     'Image URL':   values.imageUrl.value.value || '',
     'Button Enabled': values.buttonEnabled.value.selected_option.value === 'true',
     'Button Text':   values.buttonText.value.value || '',
@@ -493,7 +494,8 @@ async function handleEditEventSubmission({ ack, body, client }) {
     'Venue Key':      values.venue.value.value,
     'Description':    values.description.value.value,
     'Host':           values.host.value.value,
-    'Publish State':  values.publish.value.selected_option.value,
+    // Map "Published"/"Draft" to boolean
+    'Publish State':  values.publish.value.selected_option.value === 'Published',
     'Image URL':      values.imageUrl?.value.value || '',
     'Button Enabled': values.buttonEnabled?.value.selected_option.value === 'true',
     'Button Text':    values.buttonText?.value.value || '',
