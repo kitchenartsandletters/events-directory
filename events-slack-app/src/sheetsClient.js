@@ -71,7 +71,7 @@ async function appendEvent(eventObj) {
     eventObj['Description'],
     eventObj['Image URL'] || '',
     eventObj['Host'] || '',
-    eventObj['Publish State'] || 'Draft',
+    eventObj['Publish State'] || 'FALSE',
     eventObj['Button Enabled'] || false,
     eventObj['Button Text'] || '',
     eventObj['Button Link'] || ''
@@ -121,7 +121,7 @@ async function updateEvent(eventObj) {
     eventObj['Description'],
     eventObj['Image URL'] || '',
     eventObj['Host'] || '',
-    eventObj['Publish State'] || 'Draft',
+    eventObj['Publish State'] || 'FALSE',
     eventObj['Button Enabled'] || false,
     eventObj['Button Text'] || '',
     eventObj['Button Link'] || ''

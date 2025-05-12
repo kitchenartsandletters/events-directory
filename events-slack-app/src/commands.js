@@ -137,8 +137,8 @@ async function createEvent({ command, ack, client }) {
               type: 'static_select',
               action_id: 'value',
               options: [
-                { text: { type: 'plain_text', text: 'Draft' }, value: 'Draft' },
-                { text: { type: 'plain_text', text: 'Published' }, value: 'Published' }
+                { text: { type: 'plain_text', text: 'Draft' }, value: 'FALSE' },
+                { text: { type: 'plain_text', text: 'Published' }, value: 'TRUE' }
               ]
             }
           },
@@ -225,7 +225,7 @@ async function editEvent({ command, ack, respond, client }) {
 
   // Convert boolean publish state to string for the dropdown
   const publishStateText = event['Publish State'] === true ? 'Published' : 'Draft';
-  const publishStateValue = event['Publish State'] === true ? 'Published' : 'Draft';
+  const publishStateValue = event['Publish State'] === true ? 'TRUE' : 'FALSE';
 
   // Convert boolean button enabled to string for the dropdown
   const buttonEnabledText = event['Button Enabled'] === true ? 'Yes' : 'No';
@@ -360,8 +360,8 @@ async function editEvent({ command, ack, respond, client }) {
               value: publishStateValue
             },
             options: [
-              { text: { type: 'plain_text', text: 'Draft' }, value: 'Draft' },
-              { text: { type: 'plain_text', text: 'Published' }, value: 'Published' }
+              { text: { type: 'plain_text', text: 'Draft' }, value: 'FALSE' },
+              { text: { type: 'plain_text', text: 'Published' }, value: 'TRUE' }
             ]
           }
         },
