@@ -487,9 +487,9 @@ async function handleEditEventSubmission({ ack, body, client }) {
     ? toEtIso(new Date(msOrigEnd))
     : originalEvent['End Time'];
 
-  // Convert "Published"/"Draft" to boolean
-  const publishState = values.publish.value.selected_option.value === 'Published';
-  // Convert "true"/"false" string to boolean
+  // Get the Publish State value directly (keep as "Published" or "Draft")
+  const publishState = values.publish.value.selected_option.value;
+  // Convert "true"/"false" string to boolean for Button Enabled
   const buttonEnabled = values.buttonEnabled.value.selected_option.value === 'true';
 
   const updatedEvent = {
