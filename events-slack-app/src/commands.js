@@ -223,6 +223,14 @@ async function editEvent({ command, ack, respond, client }) {
     value: v.Key
   }));
 
+  // Convert boolean publish state to string for the dropdown
+  const publishStateText = event['Publish State'] === true ? 'Published' : 'Draft';
+  const publishStateValue = event['Publish State'] === true ? 'Published' : 'Draft';
+
+  // Convert boolean button enabled to string for the dropdown
+  const buttonEnabledText = event['Button Enabled'] === true ? 'Yes' : 'No';
+  const buttonEnabledValue = event['Button Enabled'] === true ? 'true' : 'false';
+
   // Open pre-filled edit modal
   await client.views.open({
     trigger_id: command.trigger_id,
@@ -348,8 +356,8 @@ async function editEvent({ command, ack, respond, client }) {
             type: 'static_select',
             action_id: 'value',
             initial_option: {
-              text: { type: 'plain_text', text: event['Publish State'] },
-              value: event['Publish State']
+              text: { type: 'plain_text', text: publishStateText },
+              value: publishStateValue
             },
             options: [
               { text: { type: 'plain_text', text: 'Draft' }, value: 'Draft' },
@@ -377,8 +385,8 @@ async function editEvent({ command, ack, respond, client }) {
             type: 'static_select',
             action_id: 'value',
             initial_option: {
-              text: { type: 'plain_text', text: event['Button Enabled'] ? 'Yes' : 'No' },
-              value: event['Button Enabled'] ? 'true' : 'false'
+              text: { type: 'plain_text', text: buttonEnabledText },
+              value: buttonEnabledValue
             },
             options: [
               { text: { type: 'plain_text', text: 'Yes' }, value: 'true' },
@@ -479,6 +487,11 @@ async function handleEditEventSubmission({ ack, body, client }) {
     ? toEtIso(new Date(msOrigEnd))
     : originalEvent['End Time'];
 
+  // Convert "Published"/"Draft" to boolean
+  const publishState = values.publish.value.selected_option.value === 'Published';
+  // Convert "true"/"false" string to boolean
+  const buttonEnabled = values.buttonEnabled.value.selected_option.value === 'true';
+
   const updatedEvent = {
     RowIndex: meta.RowIndex,
     ID: meta.ID,
@@ -491,16 +504,16 @@ async function handleEditEventSubmission({ ack, body, client }) {
     'End Time':   values.end.value.selected_date_time
       ? toEtIso(new Date(values.end.value.selected_date_time * 1000))
       : normalizedOrigEnd,
-    'Venue Key':      values.venue.value.value,
+    'Venue Key':      values.venue.value.selected_option.value,
     'Description':    values.description.value.value,
     'Host':           values.host.value.value,
-    // Map "Published"/"Draft" to boolean
-    'Publish State':  values.publish.value.selected_option.value === 'Published',
+    'Publish State':  publishState,
     'Image URL':      values.imageUrl?.value.value || '',
-    'Button Enabled': values.buttonEnabled?.value.selected_option.value === 'true',
+    'Button Enabled': buttonEnabled,
     'Button Text':    values.buttonText?.value.value || '',
     'Button Link':    values.buttonLink?.value.value || ''
   };
+
   try {
     await updateEvent(updatedEvent);
     await client.chat.postMessage({
@@ -511,7 +524,7 @@ async function handleEditEventSubmission({ ack, body, client }) {
     console.error('Error updating event in Sheets:', error);
     await client.chat.postMessage({
       channel: body.user.id,
-      text: '❌ There was an error saving your changes. Please try again.'
+      text: `❌ There was an error saving your changes. Please try again. Error: ${error.message}`
     });
   }
 }
