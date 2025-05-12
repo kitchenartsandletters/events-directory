@@ -187,7 +187,7 @@ async function createEvent({ command, ack, client }) {
 
 /**
  * Handler for the /edit-event slash command.
- * Opens a modal pre-filled with the event’s current data.
+ * Opens a modal pre-filled with the event's current data.
  */
 async function editEvent({ command, ack, respond, client }) {
   await ack();
@@ -223,13 +223,17 @@ async function editEvent({ command, ack, respond, client }) {
     value: v.Key
   }));
 
-  // Convert boolean publish state to string for the dropdown
-  const publishStateText = event['Publish State'] === true ? 'Published' : 'Draft';
-  const publishStateValue = event['Publish State'] === true ? 'TRUE' : 'FALSE';
+  // Convert boolean or string publish state to string for the dropdown
+  // We'll support both true/false boolean values and "TRUE"/"FALSE" string values
+  const publishStateText = String(event['Publish State']).toUpperCase() === 'TRUE' || event['Publish State'] === true ? 'Published' : 'Draft';
+  
+  // Convert boolean or string button enabled to string for the dropdown
+  // We'll support both true/false boolean values and "true"/"false" string values  
+  const buttonEnabledText = String(event['Button Enabled']).toLowerCase() === 'true' || event['Button Enabled'] === true ? 'Yes' : 'No';
+  const buttonEnabledValue = String(event['Button Enabled']).toLowerCase() === 'true' || event['Button Enabled'] === true ? 'true' : 'false';
 
-  // Convert boolean button enabled to string for the dropdown
-  const buttonEnabledText = event['Button Enabled'] === true ? 'Yes' : 'No';
-  const buttonEnabledValue = event['Button Enabled'] === true ? 'true' : 'false';
+  console.log('Opening edit modal with publish state:', event['Publish State'], '→', publishStateText);
+  console.log('Button enabled:', event['Button Enabled'], '→', buttonEnabledText);
 
   // Open pre-filled edit modal
   await client.views.open({
@@ -357,11 +361,11 @@ async function editEvent({ command, ack, respond, client }) {
             action_id: 'value',
             initial_option: {
               text: { type: 'plain_text', text: publishStateText },
-              value: publishStateValue
+              value: publishStateText
             },
             options: [
-              { text: { type: 'plain_text', text: 'Draft' }, value: 'FALSE' },
-              { text: { type: 'plain_text', text: 'Published' }, value: 'TRUE' }
+              { text: { type: 'plain_text', text: 'Draft' }, value: 'Draft' },
+              { text: { type: 'plain_text', text: 'Published' }, value: 'Published' }
             ]
           }
         },
@@ -487,10 +491,18 @@ async function handleEditEventSubmission({ ack, body, client }) {
     ? toEtIso(new Date(msOrigEnd))
     : originalEvent['End Time'];
 
-  // Convert "Published"/"Draft" string to boolean (true/false)
-  const publishState = values.publish.value.selected_option.value === 'Published';
+  // Get selected values from the modal
+  const selectedPublishState = values.publish.value.selected_option.value;
+  const selectedButtonEnabled = values.buttonEnabled.value.selected_option.value;
+  
+  // Convert "Published"/"Draft" to boolean true/false for the sheet
+  const publishState = selectedPublishState === 'Published';
+  
   // Convert "true"/"false" string to boolean for Button Enabled
-  const buttonEnabled = values.buttonEnabled.value.selected_option.value === 'true';
+  const buttonEnabled = selectedButtonEnabled === 'true';
+
+  console.log('Selected publish state:', selectedPublishState, '→', publishState);
+  console.log('Selected button enabled:', selectedButtonEnabled, '→', buttonEnabled);
 
   const updatedEvent = {
     RowIndex: meta.RowIndex,
@@ -507,18 +519,19 @@ async function handleEditEventSubmission({ ack, body, client }) {
     'Venue Key':      values.venue.value.selected_option.value,
     'Description':    values.description.value.value,
     'Host':           values.host.value.value,
-    'Publish State':  publishState,
+    'Publish State':  publishState, // Should be a boolean now
     'Image URL':      values.imageUrl?.value.value || '',
-    'Button Enabled': buttonEnabled,
+    'Button Enabled': buttonEnabled, // Should be a boolean now
     'Button Text':    values.buttonText?.value.value || '',
     'Button Link':    values.buttonLink?.value.value || ''
   };
 
   try {
+    console.log('Publishing event with publish state:', updatedEvent['Publish State']);
     await updateEvent(updatedEvent);
     await client.chat.postMessage({
       channel: body.user.id,
-      text: `✅ Event *${updatedEvent['Event Name']}* updated. Publish State: ${publishState ? 'true' : 'false'}`
+      text: `✅ Event *${updatedEvent['Event Name']}* updated. Publish State: ${publishState ? 'Published' : 'Draft'}`
     });
   } catch (error) {
     console.error('Error updating event in Sheets:', error);
