@@ -15,7 +15,7 @@ function doGet(e) {
     return obj;
   });
   // Filter to only include events marked as Published
-  const publishedEvents = events.filter(evt => evt['Publish State'] === 'Published');
+  const publishedEvents = events.filter(evt => evt['Publish State'] === true);
   // Read Venues sheet
   const vSheet  = ss.getSheetByName('Venues');
   const vData   = vSheet.getDataRange().getValues();
@@ -55,8 +55,8 @@ function unpublishPastEvents() {
   let updatedRows = [];
   const newValues = values.map(row => {
     const start = new Date(row[startCol]);
-    if (row[stateCol] === 'Published' && start < now) {
-      row[stateCol] = 'Unpublished';
+    if (row[stateCol] === true && start < now) {
+      row[stateCol] = false;
       updatedRows.push(row[idCol]);
     }
     return row;
