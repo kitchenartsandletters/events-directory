@@ -487,8 +487,8 @@ async function handleEditEventSubmission({ ack, body, client }) {
     ? toEtIso(new Date(msOrigEnd))
     : originalEvent['End Time'];
 
-  // Get the Publish State value directly (keep as "Published" or "Draft")
-  const publishState = values.publish.value.selected_option.value;
+  // Convert "Published"/"Draft" string to boolean (true/false)
+  const publishState = values.publish.value.selected_option.value === 'Published';
   // Convert "true"/"false" string to boolean for Button Enabled
   const buttonEnabled = values.buttonEnabled.value.selected_option.value === 'true';
 
@@ -518,7 +518,7 @@ async function handleEditEventSubmission({ ack, body, client }) {
     await updateEvent(updatedEvent);
     await client.chat.postMessage({
       channel: body.user.id,
-      text: `✅ Event *${updatedEvent['Event Name']}* updated.`
+      text: `✅ Event *${updatedEvent['Event Name']}* updated. Publish State: ${publishState ? 'true' : 'false'}`
     });
   } catch (error) {
     console.error('Error updating event in Sheets:', error);
